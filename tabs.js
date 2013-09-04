@@ -63,10 +63,10 @@ define(function(require, exports, module) {
         
         var cycleKeyPressed, changedPages, unchangedPages, dirtyNextTab;
 
-        const ACTIVEPAGE = function(){ return tabs.focussedPage; };
-        const ACTIVEPATH = function(){ return (tabs.focussedPage || 1).path; };
-        const MOREPAGES  = function(){ return tabs.getPages().length > 1 };
-        const MORETABS   = function(){ return tabs.getTabs(tabs.container).length > 1 };
+        var ACTIVEPAGE = function(){ return tabs.focussedPage; };
+        var ACTIVEPATH = function(){ return (tabs.focussedPage || 1).path; };
+        var MOREPAGES  = function(){ return tabs.getPages().length > 1 };
+        var MORETABS   = function(){ return tabs.getTabs(tabs.container).length > 1 };
         
         var movekey = "Command-Option-Shift"
         var definition = [
