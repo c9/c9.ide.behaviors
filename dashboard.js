@@ -27,12 +27,12 @@ define(function(require, exports, module) {
             
             ui.insertCss(css, handle);
 
-            dashboard.on("widget.create", function(e){
+            dashboard.on("widgetCreate", function(e){
                 if (e.widget.dashboard.configurable)
                     addInteraction(e.widget);
             }, handle);
             
-            dashboard.on("widget.afterClose", function(e){
+            dashboard.on("widgetAfterClose", function(e){
                 //@todo keep total tree small
             }, handle);
         }

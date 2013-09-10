@@ -305,7 +305,7 @@ define(function(require, exports, module) {
                 }
             }
 
-            mnuContext.on("prop.visible", removeContextInfo, false);
+            mnuContext.on("propVisible", removeContextInfo, false);
     
             menus.addItemByPath("Reveal in File Tree", new apf.item({
                 command : "revealtab"
