@@ -350,7 +350,7 @@ define(function(require, exports, module) {
             menuClosedItems.hide();
 
             // Other Hooks
-            tabs.on("tab.create", function(e){
+            tabs.on("paneCreate", function(e){
                 var tab = e.tab.aml;
                 tab.on("contextmenu", function(e) {
                     if (!e.currentTarget) return;
@@ -363,7 +363,7 @@ define(function(require, exports, module) {
             })
     
             //@todo store the stack for availability after reload
-            tabs.on("page.before.close", function(e) {
+            tabs.on("pageBeforeClose", function(e) {
                 var page  = e.page;
                 var event = e.htmlEvent || {};
                 
@@ -379,19 +379,19 @@ define(function(require, exports, module) {
                 }
             });
             
-            tabs.on("page.after.close", function(e) {
+            tabs.on("pageAfterClose", function(e) {
                 // Hack to force focus on the right tab
                 if (tabs.focussedPage == e.page && accessList[1])
                     e.page.tab.aml.nextTabInLine = accessList[1].aml;
             });
             
-            tabs.on("page.reparent", function(e) {
+            tabs.on("pageReparent", function(e) {
                 // Hack to force focus on the right tab
                 if (tabs.focussedPage == e.page && accessList[1])
                     e.lastTab.aml.nextTabInLine = accessList[1].aml;
             });
             
-            tabs.on("page.destroy", function(e) {
+            tabs.on("pageDestroy", function(e) {
                 var page = e.page;
                 if (page.document.meta.preview)
                     return;
@@ -401,7 +401,7 @@ define(function(require, exports, module) {
                 paneList.remove(page);
             });
             
-            tabs.on("page.create", function(e){
+            tabs.on("pageCreate", function(e){
                 var page = e.page;
 
                 if (page.title) {
@@ -457,7 +457,7 @@ define(function(require, exports, module) {
                     revealtab(page, true);
                 }
             });
-            tabs.on("after.activate", function(e){
+            tabs.on("afterActivate", function(e){
                 var page = e.page;
                 if (page == tabs.focussedPage) 
                     return;

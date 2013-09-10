@@ -30,7 +30,7 @@ define(function(require, exports, module) {
             // Insert CSS
             ui.insertCss(css, options.staticPrefix, handle);
 
-            tabs.on("page.create", function(e){
+            tabs.on("pageCreate", function(e){
                 var page = e.page;
                 
                 addInteraction(page);
@@ -41,7 +41,7 @@ define(function(require, exports, module) {
                 })
             }, handle);
             
-            tabs.on("page.after.close", function(e){
+            tabs.on("pageAfterClose", function(e){
                 if (e.last && canTabBeRemoved(e.page.tab, 1)) {
                     e.page.tab.aml.skipAnimOnce = true;
                     e.page.unload();

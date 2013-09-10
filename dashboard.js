@@ -32,7 +32,7 @@ define(function(require, exports, module) {
                     addInteraction(e.widget);
             }, handle);
             
-            dashboard.on("widget.after.close", function(e){
+            dashboard.on("widget.afterClose", function(e){
                 //@todo keep total tree small
             }, handle);
         }
