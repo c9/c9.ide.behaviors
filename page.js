@@ -51,7 +51,7 @@ define(function(require, exports, module) {
         }
         
         function canTabBeRemoved(pane, min){
-            if (!pane || pane.getPages().length > (min || 0)) 
+            if (!pane || pane.getTabs().length > (min || 0)) 
                 return false;
             
             var containers = tabs.containers;
@@ -86,7 +86,7 @@ define(function(require, exports, module) {
                 
                 // Attach tab to pane
                 if (e) {
-                    var curpage  = pane.getPage();
+                    var curpage  = pane.getTab();
                     if (curpage) {
                         var curbtn = curpage.$button;
                         ui.setStyleClass(curbtn, "", ["curbtn"]);
@@ -98,7 +98,7 @@ define(function(require, exports, module) {
                 var container = pane.$buttons;
                 var nodes     = container.childNodes;
                 var rect      = container.getBoundingClientRect();
-                var btn       = (pane.getPage() || { $button: button }).$button;
+                var btn       = (pane.getTab() || { $button: button }).$button;
                 var diff      = ui.getWidthDiff(btn);
                 
                 var leftMargin   = parseInt(ui.getStyle(btn, "marginLeft"), 10) || 0;
@@ -107,7 +107,7 @@ define(function(require, exports, module) {
                 if (maxWidth > 500) maxWidth = 150;
                 
                 leftPos      = rect.left;
-                pages        = pane.getPages();
+                pages        = pane.getTabs();
                 leftPadding  = parseInt(ui.getStyle(container, "paddingLeft"), 10) || 0;
                 rightPadding = (parseInt(ui.getStyle(container, "paddingRight"), 10) || 0) + 24;
                 
@@ -167,14 +167,14 @@ define(function(require, exports, module) {
                     if (change === true) {
                         var maxTabWidth = Math.min(maxWidth + diff, 
                           ((rect.width - leftPadding - rightPadding + rightMargin) 
-                            / pane.getPages().length) - rightMargin);
+                            / pane.getTabs().length) - rightMargin);
                         tabWidth = maxTabWidth + leftMargin + rightMargin;
                         
                         var cb = clean.bind(this, false);
-                        return animatePages(cb, null, maxTabWidth - diff);
+                        return animateTabs(cb, null, maxTabWidth - diff);
                     }
                     
-                    if (curbtn && curpage == pane.getPage()) {
+                    if (curbtn && curpage == pane.getTab()) {
                         ui.setStyleClass(curbtn, "curbtn");
                         curbtn = null;
                     }
@@ -333,7 +333,7 @@ define(function(require, exports, module) {
             function showOrderPosition(idx, toWidth, finalize, finish){
                 if (idx < 0) idx = 0;
                 
-                var orderPage = (pages[idx - 1] == tab
+                var orderTab = (pages[idx - 1] == tab
                     ? pages[idx + 1]
                     : pages[idx]) || null;
                 
@@ -342,7 +342,7 @@ define(function(require, exports, module) {
                 
                 if (finalize) {
                     // Get new pages with new order
-                    pages = pane.getPages();
+                    pages = pane.getTabs();
                     
                     // Reparent for real
                     var insert = pages[idx] && pages[idx].cloud9tab;
@@ -350,28 +350,28 @@ define(function(require, exports, module) {
                 }
                 else {
                     // If we're already at this position do nothing
-                    if (orderPage == tab)
+                    if (orderTab == tab)
                         return;
                     
                     // Move tab to new position
-                    var idx = pane.childNodes.indexOf(orderPage);
+                    var idx = pane.childNodes.indexOf(orderTab);
                     if (idx > -1) pane.childNodes.splice(idx, 0, tab);
                     else pane.childNodes.push(tab);
                     
                     pane.$buttons.insertBefore(tab.$button, 
-                        orderPage && orderPage.$button || btnPlus);
+                        orderTab && orderTab.$button || btnPlus);
                 }
                 
                 // Patch + button which is changed to "" again
                 // btnPlus.style.position = "absolute";
                 // btnPlus.style.top      = "6px";
                 
-                animatePages(finish, finalize, toWidth);
+                animateTabs(finish, finalize, toWidth);
             }
             
-            function animatePages(finish, includePage, toWidth){
+            function animateTabs(finish, includeTab, toWidth){
                 // Get new pages array (with new order)
-                pages = pane.getPages();
+                pages = pane.getTabs();
                 pages.push({$button: btnPlus});
 
                 // Animate all pages to their right position
@@ -380,7 +380,7 @@ define(function(require, exports, module) {
                     p = pages[i];
                     
                     // Ignore the tab we are dragging
-                    if (!includePage && tab === p) {
+                    if (!includeTab && tab === p) {
                         if (p.$button.parentNode == document.body)
                             offset = 1;
                         if (toWidth) 
@@ -398,7 +398,7 @@ define(function(require, exports, module) {
                                 ? "cubic-bezier(.30, .08, 0, 1)"
                                 : "linear"
                         };
-                        if (includePage || tab !== p)
+                        if (includeTab || tab !== p)
                             tween.left  = toLeft + "px";
                         if (toWidth && p.localName)
                             tween.width = toWidth + "px";
@@ -447,7 +447,7 @@ define(function(require, exports, module) {
                 var idx = Math.floor(x / tabWidth);
                 
                 // Show final order
-                var orderPage = showOrderPosition(idx, null, true, finish);
+                var orderTab = showOrderPosition(idx, null, true, finish);
                 
                 // Activate tab
                 plugin.activate();
