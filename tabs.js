@@ -40,9 +40,9 @@ define(function(require, exports, module) {
         var paneList     = [];
         var accessedPane = 0;
         paneList.add     = function(page, first){
-            var tab = page.tab, found;
+            var pane = page.pane, found;
             this.every(function(page){
-                if (page.tab && page.tab == tab) {
+                if (page.pane && page.pane == pane) {
                     found = page;
                     return false;
                 }
@@ -75,10 +75,10 @@ define(function(require, exports, module) {
             ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MOREPAGES,  "close all opened tabs, except the tab that is currently active"],
             ["gototabright",   "Command-]",        "Ctrl-]",          MOREPAGES,  "navigate to the next tab, right to the tab that is currently active"],
             ["gototableft",    "Command-[",        "Ctrl-[",          MOREPAGES,  "navigate to the next tab, left to the tab that is currently active"],
-            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MOREPAGES,  "move the tab that is currently active to the right. Will create a split pane to the right if it's the right most tab."],
-            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MOREPAGES,  "move the tab that is currently active to the left. Will create a split pane to the left if it's the left most tab."],
-            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MOREPAGES,  "move the tab that is currently active to the up. Will create a split pane to the top if it's the top most tab."],
-            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MOREPAGES,  "move the tab that is currently active to the down. Will create a split pane to the bottom if it's the bottom most tab."],
+            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MOREPAGES,  "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
+            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MOREPAGES,  "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
+            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MOREPAGES,  "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
+            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MOREPAGES,  "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
             ["tab1",           "Command-1",        "Ctrl-1",          null,       "navigate to the first tab"],
             ["tab2",           "Command-2",        "Ctrl-2",          null,       "navigate to the second tab"],
             ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
@@ -92,27 +92,27 @@ define(function(require, exports, module) {
             ["revealtab",      "Shift-Command-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
             ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MOREPAGES,  "navigate to the next tab in the stack of accessed tabs"],
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MOREPAGES,  "navigate to the previous tab in the stack of accessed tabs"],
-            ["nextpane",       "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next pane in the stack of panes"],
-            ["previouspane",   "Option-Shift-L",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous pane in the stack of panes"],
+            ["nexttab",        "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of tabs"],
+            ["previoustab",    "Option-Shift-L",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous tab in the stack of tabs"],
             ["closealltotheright", "", "", function(){
-                var page = mnuContext.$page || mnuContext.$tab && mnuContext.$tab.getPage();
+                var page = mnuContext.$page || mnuContext.$pane && mnuContext.$pane.getPage();
                 if (page) {
-                    var pages = page.tab.getPages();
+                    var pages = page.pane.getPages();
                     return pages.pop() != page;
                 }
-            }, "close all tabs to the right of the focussed page"],
+            }, "close all tabs to the right of the focussed tab"],
             ["closealltotheleft", "", "", function(){
-                var page = mnuContext.$page || mnuContext.$tab && mnuContext.$tab.getPage();
+                var page = mnuContext.$page || mnuContext.$pane && mnuContext.$pane.getPage();
                 if (page) {
-                    var pages = page.tab.getPages();
+                    var pages = page.pane.getPages();
                     return pages.length > 1 && pages[0] != page;
                 }
-            }, "close all tabs to the left of the focussed page"],
+            }, "close all tabs to the left of the focussed tab"],
             ["closepane", "Command-Ctrl-W", "Ctrl-W", function(){
                 return mnuContext.$page || tabs.getTabs().length > 1;
             },  "close all tabs in this pane"],
-            ["hsplit",     "", "", null, "split the current pane horizontally and move the active page to it"],
-            ["vsplit",     "", "", null, "split the current pane horizontally and move the active page to it"],
+            ["hsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
+            ["vsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
             ["twovsplit",  "", "", null, "create a two pane vertical layout"],
             ["twohsplit",  "", "", null, "create a two pane horizontal layout"],
             ["foursplit",  "", "", null, "create a four pane layout"],
@@ -186,7 +186,7 @@ define(function(require, exports, module) {
                     isAvailable : item[3],
                     exec        : function (editor, arg) {
                         if (arg && !arg[0] && arg.source == "click")
-                            arg = [mnuContext.$page, mnuContext.$tab];
+                            arg = [mnuContext.$page, mnuContext.$pane];
                         plugin[item[0]].apply(plugin, arg);
                     }
                 }, plugin);
@@ -275,8 +275,8 @@ define(function(require, exports, module) {
             mnuTabs.addEventListener("prop.visible", function(e) {
                 if (e.value) {
                     if (mnuTabs.opener && mnuTabs.opener.parentNode.localName == "tab") {
-                        mnuContext.$tab  = mnuTabs.opener.parentNode.cloud9tab;
-                        mnuContext.$page = mnuContext.$tab.getPage();
+                        mnuContext.$pane  = mnuTabs.opener.parentNode.cloud9pane;
+                        mnuContext.$page = mnuContext.$pane.getPage();
                     }
                     updateTabMenu();
                 }
@@ -300,7 +300,7 @@ define(function(require, exports, module) {
                     // use setTimeout because apf closes menu before menuitem onclick event
                     setTimeout(function(){
                         mnuContext.$page = null;
-                        mnuContext.tab   = null;
+                        mnuContext.pane   = null;
                     })
                 }
             }
@@ -351,15 +351,15 @@ define(function(require, exports, module) {
 
             // Other Hooks
             tabs.on("paneCreate", function(e){
-                var tab = e.tab.aml;
-                tab.on("contextmenu", function(e) {
+                var pane = e.pane.aml;
+                pane.on("contextmenu", function(e) {
                     if (!e.currentTarget) return;
                     mnuContext.$page = e.currentTarget.tagName == "page"
                         ? e.currentTarget.cloud9page : null;
-                    mnuContext.$tab = e.currentTarget.tagName == "tab"
-                        ? e.currentTarget.cloud9tab : null;
+                    mnuContext.$pane = e.currentTarget.tagName == "tab"
+                        ? e.currentTarget.cloud9pane : null;
                 });
-                tab.setAttribute("contextmenu", mnuContext);
+                pane.setAttribute("contextmenu", mnuContext);
             })
     
             //@todo store the stack for availability after reload
@@ -380,13 +380,13 @@ define(function(require, exports, module) {
             });
             
             tabs.on("pageAfterClose", function(e) {
-                // Hack to force focus on the right tab
+                // Hack to force focus on the right pane
                 if (tabs.focussedPage == e.page && accessList[1])
-                    e.page.tab.aml.nextTabInLine = accessList[1].aml;
+                    e.page.pane.aml.nextTabInLine = accessList[1].aml;
             });
             
             tabs.on("pageReparent", function(e) {
-                // Hack to force focus on the right tab
+                // Hack to force focus on the right pane
                 if (tabs.focussedPage == e.page && accessList[1])
                     e.lastTab.aml.nextTabInLine = accessList[1].aml;
             });
@@ -629,7 +629,7 @@ define(function(require, exports, module) {
             if (!page)
                 page = mnuContext.$page || tabs.focussedPage;
                 
-            var pages   = page.tab.getPages();
+            var pages   = page.pane.getPages();
             var currIdx = pages.indexOf(page);
             var ignore  = {};
     
@@ -645,7 +645,7 @@ define(function(require, exports, module) {
             if (!page)
                 page = mnuContext.$page || tabs.focussedPage;
                 
-            var pages   = page.tab.getPages();
+            var pages   = page.pane.getPages();
             var currIdx = pages.indexOf(page);
             var ignore  = {};
     
@@ -665,7 +665,7 @@ define(function(require, exports, module) {
                 accessedTab = 0;
     
             var next = accessList[accessedTab];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return nexttab();
             tabs.focusPage(next, null, true);
     
@@ -680,7 +680,7 @@ define(function(require, exports, module) {
                 accessedTab = accessList.length - 1;
     
             var next = accessList[accessedTab];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return previoustab();
             tabs.focusPage(next, null, true);
     
@@ -695,7 +695,7 @@ define(function(require, exports, module) {
                 accessedPane = 0;
     
             var next = paneList[accessedPane];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return nextpane();
             tabs.focusPage(next, null, true);
     
@@ -710,7 +710,7 @@ define(function(require, exports, module) {
                 accessedPane = paneList.length - 1;
     
             var next = paneList[accessedPane];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return previouspane();
             tabs.focusPage(next, null, true);
     
@@ -756,9 +756,9 @@ define(function(require, exports, module) {
                 
                 page = pages[idx];
             } 
-            while (!page.tab.visible);
+            while (!page.pane.visible);
     
-            if (page.tab.visible)
+            if (page.pane.visible)
                 tabs.focusPage(page, null, true);
             
             return false;
@@ -775,20 +775,20 @@ define(function(require, exports, module) {
             if (!page)
                 return;
             
-            // Pages within the current tab
-            var pages   = page.tab.getPages();
+            // Pages within the current pane
+            var pages   = page.pane.getPages();
             
             // Get new index
             var idx = pages.indexOf(page) + (bRight ? 2 : -1);
             
-            // Before current tab
+            // Before current pane
             if (idx < 0 || idx > pages.length) {
                 var dt = new Date();
-                page.tab.movePageToSplit(page, dir);
+                page.pane.movePageToSplit(page, dir);
             }
-            // In current tab
+            // In current pane
             else {
-                page.attachTo(page.tab, pages[idx], null, true);
+                page.attachTo(page.pane, pages[idx], null, true);
             }
 
             return false;
@@ -799,7 +799,7 @@ define(function(require, exports, module) {
             if (!page)
                 return;
             
-            page.tab.movePageToSplit(page, dir);
+            page.pane.movePageToSplit(page, dir);
             return false;
         }
     
@@ -825,9 +825,9 @@ define(function(require, exports, module) {
         }
     
         /**
-         * Scrolls to the selected tab's file path in the "Project Files" tree
+         * Scrolls to the selected pane's file path in the "Project Files" tree
          *
-         * Works by Finding the node related to the active tab in the tree, and
+         * Works by Finding the node related to the active pane in the tree, and
          * unfolds its parent folders until the node can be reached by an xpath
          * selector and focused, to finally scroll to the selected node.
          */
@@ -856,13 +856,13 @@ define(function(require, exports, module) {
                 tree.focus();
         }
         
-        function canTabBeRemoved(tab, min){
-            if (!tab || tab.getPages().length > (min || 0)) 
+        function canTabBeRemoved(pane, min){
+            if (!pane || pane.getPages().length > (min || 0)) 
                 return false;
             
             var containers = tabs.containers;
             for (var i = 0; i < containers.length; i++) {
-                if (ui.isChildOf(containers[i], tab.aml)) {
+                if (ui.isChildOf(containers[i], pane.aml)) {
                     return containers[i]
                         .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1
                 }
@@ -870,14 +870,14 @@ define(function(require, exports, module) {
             return false;
         }
         
-        function closepane(page, tab){
-            if (!tab)
-                tab = page.tab;
+        function closepane(page, pane){
+            if (!pane)
+                pane = page.pane;
                 
-            var pages = tab.getPages();
+            var pages = pane.getPages();
             if (!pages.length) {
-                if (canTabBeRemoved(tab))
-                    tab.unload();
+                if (canTabBeRemoved(pane))
+                    pane.unload();
                 return;
             }
             
@@ -887,26 +887,26 @@ define(function(require, exports, module) {
             // Ignore closing tabs
             menuClosedItems.ignore = true;
     
-            // Keep information to restore tab set
+            // Keep information to restore pane set
             var state = [];
-            var type  = tab.aml.parentNode.localName;
-            var nodes = tab.aml.parentNode.childNodes.filter(function(p){ 
+            var type  = pane.aml.parentNode.localName;
+            var nodes = pane.aml.parentNode.childNodes.filter(function(p){ 
                 return p.localName != "splitter";
             });
             
             state.title    = pages.length + " Tabs";
             state.type     = type == "vsplitbox" ? "vsplit" : "hsplit";
-            state.far      = nodes.indexOf(tab.aml) == 1;
+            state.far      = nodes.indexOf(pane.aml) == 1;
             state.sibling  = nodes[state.far ? 0 : 1];
             state.getState = function(){ return state };
             state.restore  = function(state){ 
-                var tab     = state.sibling;
-                if (tab && tab.clou9tab) 
-                    tab = tab.cloud9tab.aml;
-                var newtab  = state.tab[state.type](state.far, null, tab);
+                var pane     = state.sibling;
+                if (pane && pane.clou9tab) 
+                    pane = pane.cloud9pane.aml;
+                var newtab  = state.pane[state.type](state.far, null, pane);
                 
                 state.forEach(function(s){
-                    s.tab = newtab;
+                    s.pane = newtab;
                     tabs.open(s, function(){});
                 });
             };
@@ -920,8 +920,8 @@ define(function(require, exports, module) {
             
             tabs.resizeTabs();
             checkPageRender(function(){
-                if (canTabBeRemoved(tab))
-                    tab.unload();
+                if (canTabBeRemoved(pane))
+                    pane.unload();
                     
                 // Stop ignoring closing tabs
                 menuClosedItems.ignore = false;
@@ -935,8 +935,8 @@ define(function(require, exports, module) {
             if (!page)
                 page = tabs.focussedPage;
             
-            var newtab = page.tab.hsplit(true);
-            if (page.tab.getPages().length > 1)
+            var newtab = page.pane.hsplit(true);
+            if (page.pane.getPages().length > 1)
                 page.attachTo(newtab);
         }
         
@@ -944,8 +944,8 @@ define(function(require, exports, module) {
             if (!page)
                 page = tabs.focussedPage;
             
-            var newtab = page.tab.vsplit(true);
-            if (page.tab.getPages().length > 1)
+            var newtab = page.pane.vsplit(true);
+            if (page.pane.getPages().length > 1)
                 page.attachTo(newtab);
         }
         
@@ -1014,7 +1014,7 @@ define(function(require, exports, module) {
             panes[1].vsplit(true);
         }
         
-        // Record the last 10 closed tabs or tab sets
+        // Record the last 10 closed tabs or pane sets
         function addPageToClosedMenu(page){
             if (menuClosedItems.ignore) return;
             
@@ -1039,14 +1039,14 @@ define(function(require, exports, module) {
                 onclick : function(e){
                     // Update State
                     state.active = true;
-                    state.tab    = this.parentNode.tab;
+                    state.pane    = this.parentNode.pane;
                     
-                    // Open tab
+                    // Open pane
                     page.restore
                         ? page.restore(state)
                         : tabs.open(state, function(){});
                     
-                    // Remove tab from menu
+                    // Remove pane from menu
                     menuClosedItems.remove(item);
                     item.destroy(true, true);
                     
@@ -1072,8 +1072,8 @@ define(function(require, exports, module) {
         function updateTabMenu(force) {
             // Approximating order
             var pages = [];
-            tabs.getTabs().forEach(function(tab){
-                pages = pages.concat(tab.getPages());
+            tabs.getTabs().forEach(function(pane){
+                pages = pages.concat(pane.getPages());
             });
             var length = Math.min(10, pages.length);
             var start = 1000;
