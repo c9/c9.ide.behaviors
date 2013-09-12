@@ -816,7 +816,7 @@ define(function(require, exports, module) {
     
         function showTab(idx) {
             // our indexes are 0 based an the number coming in is 1 based
-            var tab = (menuItems[idx] || false).relTab;
+            var tab = (menuItems[idx] || false).relPage;
             if (!tab)
                 return false;
     
@@ -1100,7 +1100,7 @@ define(function(require, exports, module) {
                 if (!tab.title) continue;
                 menus.addItemToMenu(mnuTabs, mnu = new apf.item({
                     caption : tab.title,
-                    relTab : tab,
+                    relPage : tab,
                     command : "tab" + (i == 9 ? 0 : i + 1),
                     onclick : onclick
                 }), start + i + 1, false);
