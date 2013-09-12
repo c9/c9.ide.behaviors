@@ -7,7 +7,7 @@
 define(function(require, exports, module) {
     main.consumes = [
         "plugin", "settings", "menus", "preferences", "commands", 
-        "tabs", "ui", "save", "panels", "tree"
+        "tabManager", "ui", "save", "panels", "tree"
     ];
     main.provides = ["tabbehavior"];
     return main;
@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     function main(options, imports, register) {
         var Plugin   = imports.plugin;
         var settings = imports.settings;
-        var tabs     = imports.tabs;
+        var tabs     = imports.tabManager;
         var menus    = imports.menus;
         var commands = imports.commands;
         var tree     = imports.tree;

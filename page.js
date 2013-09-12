@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "plugin", "c9", "ui", "tabs", "ace", "anims"
+        "plugin", "c9", "ui", "tabManager", "ace", "anims"
     ];
     main.provides = ["tabinteraction"];
     return main;
@@ -10,7 +10,7 @@ define(function(require, exports, module) {
         var Plugin    = imports.plugin;
         var ui        = imports.ui;
         var anims     = imports.anims;
-        var tabs      = imports.tabs;
+        var tabs      = imports.tabManager;
         var aceHandle = imports.ace;
         
         var css = require("text!./style.css");
