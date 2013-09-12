@@ -457,7 +457,7 @@ define(function(require, exports, module) {
                     revealtab(tab, true);
                 }
             });
-            tabs.on("afterActivate", function(e){
+            tabs.on("tabAfterActivate", function(e){
                 var tab = e.tab;
                 if (tab == tabs.focussedTab) 
                     return;
