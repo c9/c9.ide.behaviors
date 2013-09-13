@@ -388,7 +388,7 @@ define(function(require, exports, module) {
             tabs.on("tabReparent", function(e) {
                 // Hack to force focus on the right pane
                 if (tabs.focussedTab == e.tab && accessList[1])
-                    e.lastTab.aml.nextTabInLine = accessList[1].aml;
+                    e.lastPane.aml.nextTabInLine = accessList[1].aml;
             });
             
             tabs.on("tabDestroy", function(e) {
