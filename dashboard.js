@@ -1,10 +1,10 @@
 define(function(require, exports, module) {
-    main.consumes = ["plugin", "ui", "dashboard"];
+    main.consumes = ["Plugin", "ui", "dashboard"];
     main.provides = ["dashboardbehavior"];
     return main;
 
     function main(options, imports, register) {
-        var Plugin    = imports.plugin;
+        var Plugin    = imports.Plugin;
         var ui        = imports.ui;
         var dashboard = imports.dashboard;
         

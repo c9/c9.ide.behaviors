@@ -6,8 +6,8 @@
  */
 define(function(require, exports, module) {
     main.consumes = [
-        "plugin", "settings", "menus", "preferences", "commands", 
-        "tabManager", "ui", "save", "panels", "tree"
+        "Plugin", "settings", "menus", "preferences", "commands", 
+        "tabManager", "ui", "save", "panels", "tree", "Menu"
     ];
     main.provides = ["tabbehavior"];
     return main;
@@ -15,10 +15,11 @@ define(function(require, exports, module) {
     //@todo collect closed pages in mnuEditors
 
     function main(options, imports, register) {
-        var Plugin   = imports.plugin;
+        var Plugin   = imports.Plugin;
         var settings = imports.settings;
         var tabs     = imports.tabManager;
         var menus    = imports.menus;
+        var Menu     = imports.Menu;
         var commands = imports.commands;
         var tree     = imports.tree;
         var save     = imports.save;
@@ -291,9 +292,7 @@ define(function(require, exports, module) {
             }, true);
 
             // Tab Context Menu
-            mnuContext = new apf.menu({id : "mnuContext"});
-            menus.importMenu(mnuContext);
-            plugin.addElement(mnuContext);
+            mnuContext = new Menu({id : "mnuContext"}, plugin).aml;
 
             function removeContextInfo(e) {
                 if (!e.value) {

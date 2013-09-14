@@ -1,13 +1,13 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "plugin", "c9", "ui", "tabManager", "ace", "anims"
+        "Plugin", "c9", "ui", "tabManager", "ace", "anims"
     ];
     main.provides = ["tabinteraction"];
     return main;
 
     function main(options, imports, register) {
         var c9        = imports.c9;
-        var Plugin    = imports.plugin;
+        var Plugin    = imports.Plugin;
         var ui        = imports.ui;
         var anims     = imports.anims;
         var tabs      = imports.tabManager;
