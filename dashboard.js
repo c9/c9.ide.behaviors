@@ -1,10 +1,10 @@
 define(function(require, exports, module) {
-    main.consumes = ["Plugin", "ui", "dashboard"];
+    main.consumes = ["plugin", "ui", "dashboard"];
     main.provides = ["dashboardbehavior"];
     return main;
 
     function main(options, imports, register) {
-        var Plugin    = imports.Plugin;
+        var Plugin    = imports.plugin;
         var ui        = imports.ui;
         var dashboard = imports.dashboard;
         
@@ -27,12 +27,12 @@ define(function(require, exports, module) {
             
             ui.insertCss(css, handle);
 
-            dashboard.on("widgetCreate", function(e){
+            dashboard.on("widget.create", function(e){
                 if (e.widget.dashboard.configurable)
                     addInteraction(e.widget);
             }, handle);
             
-            dashboard.on("widgetAfterClose", function(e){
+            dashboard.on("widget.after.close", function(e){
                 //@todo keep total tree small
             }, handle);
         }
