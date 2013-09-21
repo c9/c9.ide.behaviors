@@ -411,7 +411,6 @@ define(function(require, exports, module) {
             function mouseMoveOrder(e, toWidth){
                 if (!e) e = event;
                 
-                console.log(started);
                 if (!started) {
                     if (Math.abs(startX - e.clientX) < 4
                       && Math.abs(startY - e.clientY) < 4)
