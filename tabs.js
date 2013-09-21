@@ -6,8 +6,8 @@
  */
 define(function(require, exports, module) {
     main.consumes = [
-        "plugin", "settings", "menus", "preferences", "commands", 
-        "tabs", "ui", "save", "panels", "tree"
+        "Plugin", "settings", "menus", "preferences", "commands", 
+        "tabManager", "ui", "save", "panels", "tree", "Menu"
     ];
     main.provides = ["tabbehavior"];
     return main;
@@ -15,10 +15,11 @@ define(function(require, exports, module) {
     //@todo collect closed pages in mnuEditors
 
     function main(options, imports, register) {
-        var Plugin   = imports.plugin;
+        var Plugin   = imports.Plugin;
         var settings = imports.settings;
-        var tabs     = imports.tabs;
+        var tabs     = imports.tabManager;
         var menus    = imports.menus;
+        var Menu     = imports.Menu;
         var commands = imports.commands;
         var tree     = imports.tree;
         var save     = imports.save;
@@ -39,11 +40,11 @@ define(function(require, exports, module) {
         
         var paneList     = [];
         var accessedPane = 0;
-        paneList.add     = function(page, first){
-            var tab = page.tab, found;
-            this.every(function(page){
-                if (page.tab && page.tab == tab) {
-                    found = page;
+        paneList.add     = function(tab, first){
+            var pane = tab.pane, found;
+            this.every(function(tab){
+                if (tab.pane && tab.pane == pane) {
+                    found = tab;
                     return false;
                 }
                 return true;
@@ -51,22 +52,22 @@ define(function(require, exports, module) {
             if (found) this.remove(found);
             
             if (first == 2)
-                this.splice(1, 0, page);
+                this.splice(1, 0, tab);
             else if (first) 
-                this.unshift(page) 
+                this.unshift(tab) 
             else 
-                this.push(page);
+                this.push(tab);
         }
         
         var cycleKey     = apf.isMac ? 18 : 17;
         var paneCycleKey = 192;
         
-        var cycleKeyPressed, changedPages, unchangedPages, dirtyNextTab;
+        var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab;
 
-        var ACTIVEPAGE = function(){ return tabs.focussedPage; };
-        var ACTIVEPATH = function(){ return (tabs.focussedPage || 1).path; };
-        var MOREPAGES  = function(){ return tabs.getPages().length > 1 };
-        var MORETABS   = function(){ return tabs.getTabs(tabs.container).length > 1 };
+        var ACTIVEPAGE = function(){ return tabs.focussedTab; };
+        var ACTIVEPATH = function(){ return (tabs.focussedTab || 1).path; };
+        var MOREPAGES  = function(){ return tabs.getTabs().length > 1 };
+        var MORETABS   = function(){ return tabs.getPanes(tabs.container).length > 1 };
         
         var movekey = "Command-Option-Shift"
         var definition = [
@@ -75,10 +76,10 @@ define(function(require, exports, module) {
             ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MOREPAGES,  "close all opened tabs, except the tab that is currently active"],
             ["gototabright",   "Command-]",        "Ctrl-]",          MOREPAGES,  "navigate to the next tab, right to the tab that is currently active"],
             ["gototableft",    "Command-[",        "Ctrl-[",          MOREPAGES,  "navigate to the next tab, left to the tab that is currently active"],
-            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MOREPAGES,  "move the tab that is currently active to the right. Will create a split pane to the right if it's the right most tab."],
-            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MOREPAGES,  "move the tab that is currently active to the left. Will create a split pane to the left if it's the left most tab."],
-            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MOREPAGES,  "move the tab that is currently active to the up. Will create a split pane to the top if it's the top most tab."],
-            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MOREPAGES,  "move the tab that is currently active to the down. Will create a split pane to the bottom if it's the bottom most tab."],
+            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MOREPAGES,  "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
+            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MOREPAGES,  "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
+            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MOREPAGES,  "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
+            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MOREPAGES,  "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
             ["tab1",           "Command-1",        "Ctrl-1",          null,       "navigate to the first tab"],
             ["tab2",           "Command-2",        "Ctrl-2",          null,       "navigate to the second tab"],
             ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
@@ -92,27 +93,27 @@ define(function(require, exports, module) {
             ["revealtab",      "Shift-Command-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
             ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MOREPAGES,  "navigate to the next tab in the stack of accessed tabs"],
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MOREPAGES,  "navigate to the previous tab in the stack of accessed tabs"],
-            ["nextpane",       "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next pane in the stack of panes"],
-            ["previouspane",   "Option-Shift-L",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous pane in the stack of panes"],
+            ["nexttab",        "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of tabs"],
+            ["previoustab",    "Option-Shift-L",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous tab in the stack of tabs"],
             ["closealltotheright", "", "", function(){
-                var page = mnuContext.$page || mnuContext.$tab && mnuContext.$tab.getPage();
-                if (page) {
-                    var pages = page.tab.getPages();
-                    return pages.pop() != page;
+                var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
+                if (tab) {
+                    var pages = tab.pane.getTabs();
+                    return pages.pop() != tab;
                 }
-            }, "close all tabs to the right of the focussed page"],
+            }, "close all tabs to the right of the focussed tab"],
             ["closealltotheleft", "", "", function(){
-                var page = mnuContext.$page || mnuContext.$tab && mnuContext.$tab.getPage();
-                if (page) {
-                    var pages = page.tab.getPages();
-                    return pages.length > 1 && pages[0] != page;
+                var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
+                if (tab) {
+                    var pages = tab.pane.getTabs();
+                    return pages.length > 1 && pages[0] != tab;
                 }
-            }, "close all tabs to the left of the focussed page"],
+            }, "close all tabs to the left of the focussed tab"],
             ["closepane", "Command-Ctrl-W", "Ctrl-W", function(){
-                return mnuContext.$page || tabs.getTabs().length > 1;
+                return mnuContext.$tab || tabs.getPanes().length > 1;
             },  "close all tabs in this pane"],
-            ["hsplit",     "", "", null, "split the current pane horizontally and move the active page to it"],
-            ["vsplit",     "", "", null, "split the current pane horizontally and move the active page to it"],
+            ["hsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
+            ["vsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
             ["twovsplit",  "", "", null, "create a two pane vertical layout"],
             ["twohsplit",  "", "", null, "create a two pane horizontal layout"],
             ["foursplit",  "", "", null, "create a four pane layout"],
@@ -145,18 +146,18 @@ define(function(require, exports, module) {
                 
                 if (accessList.changed) {
                     var list = [];
-                    accessList.forEach(function(page, i){
-                        if (page && page.name)
-                            list.push(page.name);
+                    accessList.forEach(function(tab, i){
+                        if (tab && tab.name)
+                            list.push(tab.name);
                     });
                     settings.setJson("state/tabcycle", list);
                     accessList.changed = false;
                 }
                 if (paneList.changed) {
                     var list = [];
-                    paneList.forEach(function(page, i){
-                        if (page && page.name)
-                            list.push(page.name);
+                    paneList.forEach(function(tab, i){
+                        if (tab && tab.name)
+                            list.push(tab.name);
                     });
                     settings.setJson("state/panecycle", list);
                     paneList.changed = false;
@@ -186,7 +187,7 @@ define(function(require, exports, module) {
                     isAvailable : item[3],
                     exec        : function (editor, arg) {
                         if (arg && !arg[0] && arg.source == "click")
-                            arg = [mnuContext.$page, mnuContext.$tab];
+                            arg = [mnuContext.$tab, mnuContext.$pane];
                         plugin[item[0]].apply(plugin, arg);
                     }
                 }, plugin);
@@ -275,8 +276,8 @@ define(function(require, exports, module) {
             mnuTabs.addEventListener("prop.visible", function(e) {
                 if (e.value) {
                     if (mnuTabs.opener && mnuTabs.opener.parentNode.localName == "tab") {
-                        mnuContext.$tab  = mnuTabs.opener.parentNode.cloud9tab;
-                        mnuContext.$page = mnuContext.$tab.getPage();
+                        mnuContext.$pane  = mnuTabs.opener.parentNode.cloud9pane;
+                        mnuContext.$tab = mnuContext.$pane.getTab();
                     }
                     updateTabMenu();
                 }
@@ -291,21 +292,19 @@ define(function(require, exports, module) {
             }, true);
 
             // Tab Context Menu
-            mnuContext = new apf.menu({id : "mnuContext"});
-            menus.importMenu(mnuContext);
-            plugin.addElement(mnuContext);
+            mnuContext = new Menu({id : "mnuContext"}, plugin).aml;
 
             function removeContextInfo(e) {
                 if (!e.value) {
                     // use setTimeout because apf closes menu before menuitem onclick event
                     setTimeout(function(){
-                        mnuContext.$page = null;
-                        mnuContext.tab   = null;
+                        mnuContext.$tab = null;
+                        mnuContext.pane   = null;
                     })
                 }
             }
 
-            mnuContext.on("prop.visible", removeContextInfo, false);
+            mnuContext.on("propVisible", removeContextInfo, false);
     
             menus.addItemByPath("Reveal in File Tree", new apf.item({
                 command : "revealtab"
@@ -350,21 +349,21 @@ define(function(require, exports, module) {
             menuClosedItems.hide();
 
             // Other Hooks
-            tabs.on("tab.create", function(e){
-                var tab = e.tab.aml;
-                tab.on("contextmenu", function(e) {
+            tabs.on("paneCreate", function(e){
+                var pane = e.pane.aml;
+                pane.on("contextmenu", function(e) {
                     if (!e.currentTarget) return;
-                    mnuContext.$page = e.currentTarget.tagName == "page"
-                        ? e.currentTarget.cloud9page : null;
                     mnuContext.$tab = e.currentTarget.tagName == "tab"
                         ? e.currentTarget.cloud9tab : null;
+                    mnuContext.$pane = e.currentTarget.tagName == "tab"
+                        ? e.currentTarget.cloud9pane : null;
                 });
-                tab.setAttribute("contextmenu", mnuContext);
+                pane.setAttribute("contextmenu", mnuContext);
             })
     
             //@todo store the stack for availability after reload
-            tabs.on("page.before.close", function(e) {
-                var page  = e.page;
+            tabs.on("tabBeforeClose", function(e) {
+                var tab  = e.tab;
                 var event = e.htmlEvent || {};
                 
                 // Shift = close all
@@ -374,78 +373,78 @@ define(function(require, exports, module) {
                 }
                 // Alt/ Option = close all but this
                 else if (event.altKey) {
-                    closeallbutme(page);
+                    closeallbutme(tab);
                     return false;
                 }
             });
             
-            tabs.on("page.after.close", function(e) {
-                // Hack to force focus on the right tab
-                if (tabs.focussedPage == e.page && accessList[1])
-                    e.page.tab.aml.nextTabInLine = accessList[1].aml;
+            tabs.on("tabAfterClose", function(e) {
+                // Hack to force focus on the right pane
+                if (tabs.focussedTab == e.tab && accessList[1])
+                    e.tab.pane.aml.nextTabInLine = accessList[1].aml;
             });
             
-            tabs.on("page.reparent", function(e) {
-                // Hack to force focus on the right tab
-                if (tabs.focussedPage == e.page && accessList[1])
-                    e.lastTab.aml.nextTabInLine = accessList[1].aml;
+            tabs.on("tabReparent", function(e) {
+                // Hack to force focus on the right pane
+                if (tabs.focussedTab == e.tab && accessList[1])
+                    e.lastPane.aml.nextTabInLine = accessList[1].aml;
             });
             
-            tabs.on("page.destroy", function(e) {
-                var page = e.page;
-                if (page.document.meta.preview)
+            tabs.on("tabDestroy", function(e) {
+                var tab = e.tab;
+                if (tab.document.meta.preview)
                     return;
                     
-                addPageToClosedMenu(page);
-                accessList.remove(page);
-                paneList.remove(page);
+                addTabToClosedMenu(tab);
+                accessList.remove(tab);
+                paneList.remove(tab);
             });
             
-            tabs.on("page.create", function(e){
-                var page = e.page;
+            tabs.on("tabCreate", function(e){
+                var tab = e.tab;
 
-                if (page.title) {
+                if (tab.title) {
                     // @todo candidate for optimization using a hash
                     for (var i = menuClosedItems.length - 1; i >= 0; i--) {
-                        if (menuClosedItems[i].caption == page.title)
+                        if (menuClosedItems[i].caption == tab.title)
                             menuClosedItems.splice(i, 1)[0].destroy(true, true);
                     }
                 }
                 
-                if (page.document.meta.preview)
+                if (tab.document.meta.preview)
                     return;
 
-                if (accessList.indexOf(page) == -1) {
-                    var idx = accessList.indexOf(page.name);
+                if (accessList.indexOf(tab) == -1) {
+                    var idx = accessList.indexOf(tab.name);
                     if (idx == -1) { //Load accesslist from index
-                        if (page == tabs.focussedPage)
-                            accessList.unshift(page);
+                        if (tab == tabs.focussedTab)
+                            accessList.unshift(tab);
                         else
-                            accessList.push(page); //splice(1, 0, page);
+                            accessList.push(tab); //splice(1, 0, tab);
                     }
                     else
-                        accessList[idx] = page;
+                        accessList[idx] = tab;
                 }
-                if (paneList.indexOf(page) == -1) {
-                    var idx = paneList.indexOf(page.name);
+                if (paneList.indexOf(tab) == -1) {
+                    var idx = paneList.indexOf(tab.name);
                     if (idx == -1) { //Load paneList from index
-                        if (page.isActive())
-                            paneList.add(page);
+                        if (tab.isActive())
+                            paneList.add(tab);
                     }
                     else
-                        paneList[idx] = page;
+                        paneList[idx] = tab;
                 }
             });
     
             tabs.on("focus", function(e){
-                var page = e.page;
+                var tab = e.tab;
 
                 if (!cycleKeyPressed) {
-                    accessList.remove(page);
-                    accessList.unshift(page);
+                    accessList.remove(tab);
+                    accessList.unshift(tab);
                     accessList.changed = true;
                     
-                    paneList.add(page, true);
+                    paneList.add(tab, true);
                     paneList.changed = true;
                     
                     settings.save();
@@ -454,20 +453,20 @@ define(function(require, exports, module) {
                 // @todo panel switch
                 if (settings.get("user/panels/@active") == "tree" 
                   && settings.getBool('user/general/@revealfile')) {
-                    revealtab(page, true);
+                    revealtab(tab, true);
                 }
             });
-            tabs.on("after.activate", function(e){
-                var page = e.page;
-                if (page == tabs.focussedPage) 
+            tabs.on("tabAfterActivate", function(e){
+                var tab = e.tab;
+                if (tab == tabs.focussedTab) 
                     return;
             
                 if (!cycleKeyPressed) {
-                    accessList.remove(page);
-                    accessList.splice(1, 0, page);
+                    accessList.remove(tab);
+                    accessList.splice(1, 0, tab);
                     accessList.changed = true;
                     
-                    paneList.add(page, 2);
+                    paneList.add(tab, 2);
                     paneList.changed = true;
                     
                     settings.save();
@@ -487,10 +486,10 @@ define(function(require, exports, module) {
                     if (dirtyNextTab) {
                         accessedTab = 0;
     
-                        var page = tabs.focussedPage;
-                        if (accessList[accessedTab] != page) {
-                            accessList.remove(page);
-                            accessList.unshift(page);
+                        var tab = tabs.focussedTab;
+                        if (accessList[accessedTab] != tab) {
+                            accessList.remove(tab);
+                            accessList.unshift(tab);
     
                             accessList.changed = true;
                             settings.save();
@@ -505,10 +504,10 @@ define(function(require, exports, module) {
                     if (dirtyNextTab) {
                         accessedTab = 0;
     
-                        var page = tabs.focussedPage;
-                        if (paneList[accessedTab] != page) {
-                            paneList.remove(page);
-                            paneList.unshift(page);
+                        var tab = tabs.focussedTab;
+                        if (paneList[accessedTab] != tab) {
+                            paneList.remove(tab);
+                            paneList.unshift(tab);
     
                             paneList.changed = true;
                             settings.save();
@@ -520,28 +519,28 @@ define(function(require, exports, module) {
             });
     
             // tabs.addEventListener("aftersavedialogcancel", function(e) {
-            //     if (!changedPages)
+            //     if (!changedTabs)
             //         return;
     
-            //     var i, l, page;
-            //     for (i = 0, l = changedPages.length; i < l; i++) {
-            //         page = changedPages[i];
-            //         page.removeEventListener("aftersavedialogclosed", arguments.callee);
+            //     var i, l, tab;
+            //     for (i = 0, l = changedTabs.length; i < l; i++) {
+            //         tab = changedTabs[i];
+            //         tab.removeEventListener("aftersavedialogclosed", arguments.callee);
             //     }
             // });
         }
         
         /***** Methods *****/
             
-        function closetab(page) {
-            if (!page)
-                page = mnuContext.$page || tabs.focussedPage;
+        function closetab(tab) {
+            if (!tab)
+                tab = mnuContext.$tab || tabs.focussedTab;
                 
-            var pages  = tabs.getPages();
-            var isLast = pages[pages.length - 1] == page;
+            var pages  = tabs.getTabs();
+            var isLast = pages[pages.length - 1] == tab;
     
-            page.close();
-            tabs.resizeTabs(isLast);
+            tab.close();
+            tabs.resizePanes(isLast);
     
             return false;
         }
@@ -549,62 +548,62 @@ define(function(require, exports, module) {
         function closealltabs(callback) {
             callback = typeof callback == "function" ? callback : null;
     
-            changedPages = [];
-            unchangedPages = [];
+            changedTabs = [];
+            unchangedTabs = [];
     
-            var pages = tabs.getPages();
+            var pages = tabs.getTabs();
             for (var i = 0, l = pages.length; i < l; i++) {
                 closepage(pages[i], callback);
             }
     
-            checkPageRender(callback);
+            checkTabRender(callback);
         }
     
         function closeallbutme(ignore, pages, callback) {
-            // if ignore isn't a page instance, then fallback to current page, 
+            // if ignore isn't a tab instance, then fallback to current tab, 
             // unless it's an object from closealltotheright/left
-            if (!ignore || ignore.type != "page") {
+            if (!ignore || ignore.type != "tab") {
                 if (typeof ignore === "undefined" 
                   || typeof ignore.closeall === "undefined") {
-                    ignore = mnuContext.$page || tabs.focussedPage;
+                    ignore = mnuContext.$tab || tabs.focussedTab;
                 }
             }
     
-            changedPages   = [];
-            unchangedPages = [];
+            changedTabs   = [];
+            unchangedTabs = [];
     
             if (!pages)
-                pages = tabs.getPages();
+                pages = tabs.getTabs();
     
-            var page;
+            var tab;
             for (var i = 0, l = pages.length; i < l; i++) {
-                page = pages[i];
+                tab = pages[i];
     
-                if (ignore && (page == ignore || ignore.hasOwnProperty(i)))
+                if (ignore && (tab == ignore || ignore.hasOwnProperty(i)))
                     continue;
                 else
-                    closepage(page, callback);
+                    closepage(tab, callback);
             }
     
-            tabs.resizeTabs();
-            checkPageRender(callback);
+            tabs.resizePanes();
+            checkTabRender(callback);
         }
     
-        function closepage(page, callback) {
-            var doc = page.document;
+        function closepage(tab, callback) {
+            var doc = tab.document;
             if (doc.changed && (!doc.meta.newfile || doc.value))
-                changedPages.push(page);
+                changedTabs.push(tab);
             else
-                unchangedPages.push(page);
+                unchangedTabs.push(tab);
         }
     
-        function checkPageRender(callback) {
-            save.saveAllInteractive(changedPages, function(result){
+        function checkTabRender(callback) {
+            save.saveAllInteractive(changedTabs, function(result){
                 if (result != save.CANCEL) {
-                    changedPages.forEach(function(page){
-                        page.unload();
+                    changedTabs.forEach(function(tab){
+                        tab.unload();
                     })
-                    closeUnchangedPages(function() {
+                    closeUnchangedTabs(function() {
                         if (callback)
                             callback();
                     });
@@ -614,43 +613,43 @@ define(function(require, exports, module) {
             });
         }
     
-        function closeUnchangedPages(callback) {
-            var page;
-            for (var i = 0, l = unchangedPages.length; i < l; i++) {
-                page = unchangedPages[i];
-                page.close(true);
+        function closeUnchangedTabs(callback) {
+            var tab;
+            for (var i = 0, l = unchangedTabs.length; i < l; i++) {
+                tab = unchangedTabs[i];
+                tab.close(true);
             }
     
             if (callback)
                 callback();
         }
     
-        function closealltotheright(page) {
-            if (!page)
-                page = mnuContext.$page || tabs.focussedPage;
+        function closealltotheright(tab) {
+            if (!tab)
+                tab = mnuContext.$tab || tabs.focussedTab;
                 
-            var pages   = page.tab.getPages();
-            var currIdx = pages.indexOf(page);
+            var pages   = tab.pane.getTabs();
+            var currIdx = pages.indexOf(tab);
             var ignore  = {};
     
             for (var j = 0; j <= currIdx; j++) {
-                ignore[j] = page;
+                ignore[j] = tab;
             }
     
             ignore.closeall = true;
             closeallbutme(ignore, pages);
         }
     
-        function closealltotheleft(page) {
-            if (!page)
-                page = mnuContext.$page || tabs.focussedPage;
+        function closealltotheleft(tab) {
+            if (!tab)
+                tab = mnuContext.$tab || tabs.focussedTab;
                 
-            var pages   = page.tab.getPages();
-            var currIdx = pages.indexOf(page);
+            var pages   = tab.pane.getTabs();
+            var currIdx = pages.indexOf(tab);
             var ignore  = {};
     
             for (var j = pages.length - 1; j >= currIdx; j--) {
-                ignore[j] = page;
+                ignore[j] = tab;
             }
     
             ignore.closeall = true;
@@ -658,61 +657,61 @@ define(function(require, exports, module) {
         }
     
         function nexttab(){
-            if (tabs.getPages().length === 1)
+            if (tabs.getTabs().length === 1)
                 return;
     
             if (++accessedTab >= accessList.length)
                 accessedTab = 0;
     
             var next = accessList[accessedTab];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return nexttab();
-            tabs.focusPage(next, null, true);
+            tabs.focusTab(next, null, true);
     
             dirtyNextTab = true;
         }
     
         function previoustab (){
-            if (tabs.getPages().length === 1)
+            if (tabs.getTabs().length === 1)
                 return;
     
             if (--accessedTab < 0)
                 accessedTab = accessList.length - 1;
     
             var next = accessList[accessedTab];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return previoustab();
-            tabs.focusPage(next, null, true);
+            tabs.focusTab(next, null, true);
     
             dirtyNextTab = true;
         }
     
         function nextpane(){
-            if (tabs.getTabs(tabs.container).length === 1)
+            if (tabs.getPanes(tabs.container).length === 1)
                 return;
     
             if (++accessedPane >= paneList.length)
                 accessedPane = 0;
     
             var next = paneList[accessedPane];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return nextpane();
-            tabs.focusPage(next, null, true);
+            tabs.focusTab(next, null, true);
     
             dirtyNextTab = true;
         }
     
         function previouspane(){
-            if (tabs.getPages(tabs.container).length === 1)
+            if (tabs.getTabs(tabs.container).length === 1)
                 return;
     
             if (--accessedPane < 0)
                 accessedPane = paneList.length - 1;
     
             var next = paneList[accessedPane];
-            if (typeof next != "object" || !next.tab.visible)
+            if (typeof next != "object" || !next.pane.visible)
                 return previouspane();
-            tabs.focusPage(next, null, true);
+            tabs.focusTab(next, null, true);
     
             dirtyNextTab = true;
         }
@@ -726,14 +725,14 @@ define(function(require, exports, module) {
         }
     
         function cycleTab(dir) {
-            var pages   = tabs.getPages();
-            var curr    = tabs.focussedPage;
+            var pages   = tabs.getTabs();
+            var curr    = tabs.focussedTab;
             var currIdx = pages.indexOf(curr);
             if (!curr || pages.length == 1)
                 return;
     
             var start = currIdx;
-            var page;
+            var tab;
             
             do {
                 var idx = currIdx;
@@ -754,12 +753,12 @@ define(function(require, exports, module) {
                 if (start == idx)
                     return;
                 
-                page = pages[idx];
+                tab = pages[idx];
             } 
-            while (!page.tab.visible);
+            while (!tab.pane.visible);
     
-            if (page.tab.visible)
-                tabs.focusPage(page, null, true);
+            if (tab.pane.visible)
+                tabs.focusTab(tab, null, true);
             
             return false;
         }
@@ -771,35 +770,35 @@ define(function(require, exports, module) {
     
         function hmoveTab(dir) {
             var bRight  = dir == "right";
-            var page    = tabs.focussedPage;
-            if (!page)
+            var tab    = tabs.focussedTab;
+            if (!tab)
                 return;
             
-            // Pages within the current tab
-            var pages   = page.tab.getPages();
+            // Tabs within the current pane
+            var pages   = tab.pane.getTabs();
             
             // Get new index
-            var idx = pages.indexOf(page) + (bRight ? 2 : -1);
+            var idx = pages.indexOf(tab) + (bRight ? 2 : -1);
             
-            // Before current tab
+            // Before current pane
             if (idx < 0 || idx > pages.length) {
                 var dt = new Date();
-                page.tab.movePageToSplit(page, dir);
+                tab.pane.moveTabToSplit(tab, dir);
             }
-            // In current tab
+            // In current pane
             else {
-                page.attachTo(page.tab, pages[idx], null, true);
+                tab.attachTo(tab.pane, pages[idx], null, true);
             }
 
             return false;
         }
         
         function vmoveTab(dir) {
-            var page = tabs.focussedPage;
-            if (!page)
+            var tab = tabs.focussedTab;
+            if (!tab)
                 return;
             
-            page.tab.movePageToSplit(page, dir);
+            tab.pane.moveTabToSplit(tab, dir);
             return false;
         }
     
@@ -816,39 +815,39 @@ define(function(require, exports, module) {
     
         function showTab(idx) {
             // our indexes are 0 based an the number coming in is 1 based
-            var page = (menuItems[idx] || false).relPage;
-            if (!page)
+            var tab = (menuItems[idx] || false).relPage;
+            if (!tab)
                 return false;
     
-            tabs.focusPage(page, null, true);
+            tabs.focusTab(tab, null, true);
             return false;
         }
     
         /**
-         * Scrolls to the selected tab's file path in the "Project Files" tree
+         * Scrolls to the selected pane's file path in the "Project Files" tree
          *
-         * Works by Finding the node related to the active tab in the tree, and
+         * Works by Finding the node related to the active pane in the tree, and
          * unfolds its parent folders until the node can be reached by an xpath
          * selector and focused, to finally scroll to the selected node.
          */
-        function revealtab(page, noFocus) {
-            if (!page || page.command)
-                page = tabs.focussedPage;
-            if (!page)
+        function revealtab(tab, noFocus) {
+            if (!tab || tab.command)
+                tab = tabs.focussedTab;
+            if (!tab)
                 return false;
     
             // Tell other extensions to exit their fullscreen mode (for ex. Zen)
             // so this operation is visible
             // ide.dispatchEvent("exitfullscreen");
     
-            revealInTree(page, noFocus);
+            revealInTree(tab, noFocus);
         }
     
-        function revealInTree (page, noFocus) {
+        function revealInTree (tab, noFocus) {
             panels.activate("tree");
     
-            tree.expand(page.path, function(err){
-                var path = err ? "/" : page.path;
+            tree.expand(tab.path, function(err){
+                var path = err ? "/" : tab.path;
                 tree.select(path);
                 tree.scrollToSelection();
             });
@@ -856,13 +855,13 @@ define(function(require, exports, module) {
                 tree.focus();
         }
         
-        function canTabBeRemoved(tab, min){
-            if (!tab || tab.getPages().length > (min || 0)) 
+        function canTabBeRemoved(pane, min){
+            if (!pane || pane.getTabs().length > (min || 0)) 
                 return false;
             
             var containers = tabs.containers;
             for (var i = 0; i < containers.length; i++) {
-                if (ui.isChildOf(containers[i], tab.aml)) {
+                if (ui.isChildOf(containers[i], pane.aml)) {
                     return containers[i]
                         .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1
                 }
@@ -870,90 +869,90 @@ define(function(require, exports, module) {
             return false;
         }
         
-        function closepane(page, tab){
-            if (!tab)
-                tab = page.tab;
+        function closepane(tab, pane){
+            if (!pane)
+                pane = tab.pane;
                 
-            var pages = tab.getPages();
+            var pages = pane.getTabs();
             if (!pages.length) {
-                if (canTabBeRemoved(tab))
-                    tab.unload();
+                if (canTabBeRemoved(pane))
+                    pane.unload();
                 return;
             }
             
-            changedPages   = [];
-            unchangedPages = [];
+            changedTabs   = [];
+            unchangedTabs = [];
             
             // Ignore closing tabs
             menuClosedItems.ignore = true;
     
-            // Keep information to restore tab set
+            // Keep information to restore pane set
             var state = [];
-            var type  = tab.aml.parentNode.localName;
-            var nodes = tab.aml.parentNode.childNodes.filter(function(p){ 
+            var type  = pane.aml.parentNode.localName;
+            var nodes = pane.aml.parentNode.childNodes.filter(function(p){ 
                 return p.localName != "splitter";
             });
             
             state.title    = pages.length + " Tabs";
             state.type     = type == "vsplitbox" ? "vsplit" : "hsplit";
-            state.far      = nodes.indexOf(tab.aml) == 1;
+            state.far      = nodes.indexOf(pane.aml) == 1;
             state.sibling  = nodes[state.far ? 0 : 1];
             state.getState = function(){ return state };
             state.restore  = function(state){ 
-                var tab     = state.sibling;
-                if (tab && tab.clou9tab) 
-                    tab = tab.cloud9tab.aml;
-                var newtab  = state.tab[state.type](state.far, null, tab);
+                var pane     = state.sibling;
+                if (pane && pane.clou9tab) 
+                    pane = pane.cloud9pane.aml;
+                var newtab  = state.pane[state.type](state.far, null, pane);
                 
                 state.forEach(function(s){
-                    s.tab = newtab;
+                    s.pane = newtab;
                     tabs.open(s, function(){});
                 });
             };
             state.document = { meta: {} };
             
             // Close pages
-            pages.forEach(function(page){ 
-                state.push(page.getState());
-                closepage(page); 
+            pages.forEach(function(tab){ 
+                state.push(tab.getState());
+                closepage(tab); 
             });
             
-            tabs.resizeTabs();
-            checkPageRender(function(){
-                if (canTabBeRemoved(tab))
-                    tab.unload();
+            tabs.resizePanes();
+            checkTabRender(function(){
+                if (canTabBeRemoved(pane))
+                    pane.unload();
                     
                 // Stop ignoring closing tabs
                 menuClosedItems.ignore = false;
                 
                 // @todo there should probably be some check here
-                addPageToClosedMenu(state);
+                addTabToClosedMenu(state);
             });
         }
         
-        function hsplit(page){
-            if (!page)
-                page = tabs.focussedPage;
+        function hsplit(tab){
+            if (!tab)
+                tab = tabs.focussedTab;
             
-            var newtab = page.tab.hsplit(true);
-            if (page.tab.getPages().length > 1)
-                page.attachTo(newtab);
+            var newtab = tab.pane.hsplit(true);
+            if (tab.pane.getTabs().length > 1)
+                tab.attachTo(newtab);
         }
         
-        function vsplit(page){
-            if (!page)
-                page = tabs.focussedPage;
+        function vsplit(tab){
+            if (!tab)
+                tab = tabs.focussedTab;
             
-            var newtab = page.tab.vsplit(true);
-            if (page.tab.getPages().length > 1)
-                page.attachTo(newtab);
+            var newtab = tab.pane.vsplit(true);
+            if (tab.pane.getTabs().length > 1)
+                tab.attachTo(newtab);
         }
         
         function nosplit(){
-            var panes = tabs.getTabs(tabs.container);
+            var panes = tabs.getPanes(tabs.container);
             var first = panes[0];
             for (var pane, i = 1, li = panes.length; i < li; i++) {
-                var pages = (pane = panes[i]).getPages();
+                var pages = (pane = panes[i]).getTabs();
                 for (var j = 0, lj = pages.length; j < lj; j++) {
                     pages[j].attachTo(first, null, true);
                 }
@@ -962,7 +961,7 @@ define(function(require, exports, module) {
         }
         
         function twovsplit(hsplit){
-            var panes = tabs.getTabs(tabs.container);
+            var panes = tabs.getPanes(tabs.container);
             
             // We're already in a two vsplit
             if (panes.length == 2 && panes[0].aml.parentNode.localName 
@@ -978,17 +977,17 @@ define(function(require, exports, module) {
             var c = tabs.containers[0].firstChild.childNodes.filter(function(f){
                 return f.localName != "splitter";
             });
-            // var left  = c[0].getElementsByTagNameNS(apf.ns.aml, "page");
-            var right = c[1].getElementsByTagNameNS(apf.ns.aml, "page");
+            // var left  = c[0].getElementsByTagNameNS(apf.ns.aml, "tab");
+            var right = c[1].getElementsByTagNameNS(apf.ns.aml, "tab");
             
             for (var i = 1, l = panes.length; i < l; i++) {
                 panes[i].unload();
             }
             
             var newtab = panes[0][hsplit ? "hsplit" : "vsplit"](true);
-            right.forEach(function(page){
-                if (page.cloud9page)
-                    page.cloud9page.attachTo(newtab, null, true);
+            right.forEach(function(tab){
+                if (tab.cloud9tab)
+                    tab.cloud9tab.attachTo(newtab, null, true);
             });
             
             return [panes[0], newtab];
@@ -1014,19 +1013,19 @@ define(function(require, exports, module) {
             panes[1].vsplit(true);
         }
         
-        // Record the last 10 closed tabs or tab sets
-        function addPageToClosedMenu(page){
+        // Record the last 10 closed tabs or pane sets
+        function addTabToClosedMenu(tab){
             if (menuClosedItems.ignore) return;
             
-            if (page.document.meta.preview)
+            if (tab.document.meta.preview)
                 return;
             
             // Record state
-            var state = page.getState();
+            var state = tab.getState();
             
-            if (!page.restore) {
+            if (!tab.restore) {
                 for (var i = menuClosedItems.length - 1; i >= 0; i--) {
-                    if (menuClosedItems[i].caption == page.title) {
+                    if (menuClosedItems[i].caption == tab.title) {
                         menuClosedItems.splice(i, 1)[0].destroy(true, true);
                     }
                 }
@@ -1034,19 +1033,19 @@ define(function(require, exports, module) {
             
             // Create menu item
             var item  = new ui.item({
-                caption : page.title,
+                caption : tab.title,
                 style   : "padding-left:35px",
                 onclick : function(e){
                     // Update State
                     state.active = true;
-                    state.tab    = this.parentNode.tab;
+                    state.pane    = this.parentNode.pane;
                     
-                    // Open tab
-                    page.restore
-                        ? page.restore(state)
+                    // Open pane
+                    tab.restore
+                        ? tab.restore(state)
                         : tabs.open(state, function(){});
                     
-                    // Remove tab from menu
+                    // Remove pane from menu
                     menuClosedItems.remove(item);
                     item.destroy(true, true);
                     
@@ -1072,8 +1071,8 @@ define(function(require, exports, module) {
         function updateTabMenu(force) {
             // Approximating order
             var pages = [];
-            tabs.getTabs().forEach(function(tab){
-                pages = pages.concat(tab.getPages());
+            tabs.getPanes().forEach(function(pane){
+                pages = pages.concat(pane.getTabs());
             });
             var length = Math.min(10, pages.length);
             var start = 1000;
@@ -1087,20 +1086,20 @@ define(function(require, exports, module) {
             if (!pages.length)
                 return;
             
-            var mnu, page;
+            var mnu, tab;
             
             // Create new divider
             menus.addItemToMenu(mnuTabs, mnu = new apf.divider(), start, false);
             menuItems.push(mnu);
             
             // Create new items
-            var onclick = function() { tabs.focusPage(page, null, true); };
+            var onclick = function() { tabs.focusTab(tab, null, true); };
             for (var i = 0; i < length; i++) {
-                page = pages[i];
-                if (!page.title) continue;
+                tab = pages[i];
+                if (!tab.title) continue;
                 menus.addItemToMenu(mnuTabs, mnu = new apf.item({
-                    caption : page.title,
-                    relPage : page,
+                    caption : tab.title,
+                    relPage : tab,
                     command : "tab" + (i == 9 ? 0 : i + 1),
                     onclick : onclick
                 }), start + i + 1, false);
@@ -1147,7 +1146,7 @@ define(function(require, exports, module) {
         /**
          * Draws the file tree
          * @event afterfilesave Fires after a file is saved
-         *   object:
+         * @param {Object} e
          *     node     {XMLNode} description
          *     oldpath  {String} description
          **/

@@ -1,16 +1,16 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "plugin", "c9", "ui", "tabs", "ace", "anims"
+        "Plugin", "c9", "ui", "tabManager", "ace", "anims"
     ];
-    main.provides = ["pagebehavior"];
+    main.provides = ["tabinteraction"];
     return main;
 
     function main(options, imports, register) {
         var c9        = imports.c9;
-        var Plugin    = imports.plugin;
+        var Plugin    = imports.Plugin;
         var ui        = imports.ui;
         var anims     = imports.anims;
-        var tabs      = imports.tabs;
+        var tabs      = imports.tabManager;
         var aceHandle = imports.ace;
         
         var css = require("text!./style.css");
@@ -30,47 +30,47 @@ define(function(require, exports, module) {
             // Insert CSS
             ui.insertCss(css, options.staticPrefix, handle);
 
-            tabs.on("page.create", function(e){
-                var page = e.page;
+            tabs.on("tabCreate", function(e){
+                var tab = e.tab;
                 
-                addInteraction(page);
+                addInteraction(tab);
                 
                 // Make sure that events are put on the button when the skin changes
-                page.aml.on("$skinchange", function(){
-                    addInteraction(page);
+                tab.aml.on("$skinchange", function(){
+                    addInteraction(tab);
                 })
             }, handle);
             
-            tabs.on("page.after.close", function(e){
-                if (e.last && canTabBeRemoved(e.page.tab, 1)) {
-                    e.page.tab.aml.skipAnimOnce = true;
-                    e.page.unload();
-                    e.page.tab.unload();
+            tabs.on("tabAfterClose", function(e){
+                if (e.last && canTabBeRemoved(e.tab.pane, 1)) {
+                    e.tab.pane.aml.skipAnimOnce = true;
+                    e.tab.unload();
+                    e.tab.pane.unload();
                 }
             }, handle);
         }
         
-        function canTabBeRemoved(tab, min){
-            if (!tab || tab.getPages().length > (min || 0)) 
+        function canTabBeRemoved(pane, min){
+            if (!pane || pane.getTabs().length > (min || 0)) 
                 return false;
             
             var containers = tabs.containers;
             for (var i = 0; i < containers.length; i++) {
-                if (ui.isChildOf(containers[i], tab.aml)) {
+                if (ui.isChildOf(containers[i], pane.aml)) {
                     return containers[i]
-                        .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1
+                        .getElementsByTagNameNS(apf.ns.aml, "pane").length > 1
                 }
             }
             return false;
         }
         
         function addInteraction(plugin){
-            var page    = plugin.aml;
-            var button  = page.$button;
+            var tab    = plugin.aml;
+            var button  = tab.$button;
             if (!button) return;
 
             var offsetX, offsetY, startX, startY, dragWidth;
-            var mode, rightPadding, originalTab, btnPlus, tab;
+            var mode, rightPadding, originalTab, btnPlus, pane;
             var started, tabWidth, leftPadding, leftPos, start, initMouse;
             var pages, clean, originalPosition, splitDirection, splitTab;
             
@@ -78,27 +78,27 @@ define(function(require, exports, module) {
                 mode = "order";
                 clean && clean();
                 
-                // Set new tab
-                tab = toTab;
+                // Set new pane
+                pane = toTab;
                 
                 // Plus Button
-                btnPlus = tab.$ext.querySelector(".plus_tab_button");
+                btnPlus = pane.$ext.querySelector(".plus_tab_button");
                 
-                // Attach page to tab
+                // Attach tab to pane
                 if (e) {
-                    var curpage  = tab.getPage();
+                    var curpage  = pane.getTab();
                     if (curpage) {
                         var curbtn = curpage.$button;
                         ui.setStyleClass(curbtn, "", ["curbtn"]);
                     }
                     
-                    ui.setStyleClass(page.$button, "curbtn");
+                    ui.setStyleClass(tab.$button, "curbtn");
                 }
                 
-                var container = tab.$buttons;
+                var container = pane.$buttons;
                 var nodes     = container.childNodes;
                 var rect      = container.getBoundingClientRect();
-                var btn       = (tab.getPage() || { $button: button }).$button;
+                var btn       = (pane.getTab() || { $button: button }).$button;
                 var diff      = ui.getWidthDiff(btn);
                 
                 var leftMargin   = parseInt(ui.getStyle(btn, "marginLeft"), 10) || 0;
@@ -107,18 +107,18 @@ define(function(require, exports, module) {
                 if (maxWidth > 500) maxWidth = 150;
                 
                 leftPos      = rect.left;
-                pages        = tab.getPages();
+                pages        = pane.getTabs();
                 leftPadding  = parseInt(ui.getStyle(container, "paddingLeft"), 10) || 0;
                 rightPadding = (parseInt(ui.getStyle(container, "paddingRight"), 10) || 0) + 24;
                 
                 var maxTabWidth = Math.min(maxWidth + diff, 
                   ((rect.width - leftPadding - rightPadding + rightMargin) 
-                    / (pages.length + (e ? 1 : 0))) - rightMargin); // If 'e' is set, we're adding another page to this tab
+                    / (pages.length + (e ? 1 : 0))) - rightMargin); // If 'e' is set, we're adding another tab to this pane
                 var newTabWidth = maxTabWidth - diff;
                 
                 tabWidth     = maxTabWidth + leftMargin + rightMargin;
                 
-                // Get the positions info of the tab buttons
+                // Get the positions info of the pane buttons
                 var info = [];
                 for (var i = nodes.length - 1; i >= 0; i--) {
                     if ((btn = nodes[i]).nodeType != 1) continue;
@@ -127,7 +127,7 @@ define(function(require, exports, module) {
                 
                 // Append the button to the button container
                 if (e) {
-                    tab.$buttons.appendChild(button);
+                    pane.$buttons.appendChild(button);
                     info.push([button, 0, button.offsetTop, dragWidth]);
                 }
                 
@@ -143,9 +143,9 @@ define(function(require, exports, module) {
                 }
                 
                 start = function(){
-                    // Remove from childNodes of old tab
-                    var lastIndex = tab.childNodes.indexOf(page);
-                    tab.childNodes.remove(page);
+                    // Remove from childNodes of old pane
+                    var lastIndex = pane.childNodes.indexOf(tab);
+                    pane.childNodes.remove(tab);
                 }
                 
                 if (started)
@@ -167,14 +167,14 @@ define(function(require, exports, module) {
                     if (change === true) {
                         var maxTabWidth = Math.min(maxWidth + diff, 
                           ((rect.width - leftPadding - rightPadding + rightMargin) 
-                            / tab.getPages().length) - rightMargin);
+                            / pane.getTabs().length) - rightMargin);
                         tabWidth = maxTabWidth + leftMargin + rightMargin;
                         
                         var cb = clean.bind(this, false);
-                        return animatePages(cb, null, maxTabWidth - diff);
+                        return animateTabs(cb, null, maxTabWidth - diff);
                     }
                     
-                    if (curbtn && curpage == tab.getPage()) {
+                    if (curbtn && curpage == pane.getTab()) {
                         ui.setStyleClass(curbtn, "curbtn");
                         curbtn = null;
                     }
@@ -213,7 +213,7 @@ define(function(require, exports, module) {
                     button.style.width    = (dragWidth - ui.getWidthDiff(button)) + "px";
                     button.style.position = "absolute"
                     
-                    // Attach page to body
+                    // Attach tab to body
                     if (!divButton) {
                         divButton = document.createElement("div");
                         document.body.appendChild(divButton);
@@ -224,7 +224,7 @@ define(function(require, exports, module) {
                     divButton.appendChild(button);
                     
                     // Remove from parent childNodes
-                    tab.childNodes.remove(page);
+                    pane.childNodes.remove(tab);
                 }
                 
                 apf.addListener(document, "mousemove", mouseMoveSplit);
@@ -268,16 +268,16 @@ define(function(require, exports, module) {
                         frames[i].style.pointerEvents = "";
                 }
                 
-                page.$dragging = false;
+                tab.$dragging = false;
             }
             
             button.addEventListener("mousedown", function(e){
                 // Tab needs to support ordering
-                if (!page.parentNode.$order || page.$dragging || e.button == 2)
+                if (!tab.parentNode.$order || tab.$dragging || e.button == 2)
                     return;
                 
                 // APF stuff
-                page.$dragging = true;
+                tab.$dragging = true;
                 
                 startX  = e.clientX; 
                 startY  = e.clientY; 
@@ -293,7 +293,7 @@ define(function(require, exports, module) {
                     button.style.pointerEvents = "none";
                     
                     // Initialize with order mode
-                    setOrderMode(page.parentNode);
+                    setOrderMode(tab.parentNode);
                     
                     initMouse = null;
                 }
@@ -301,11 +301,11 @@ define(function(require, exports, module) {
                 // Use mine
                 started = false;
 
-                // Set current tab
-                tab = plugin.tab.aml;
+                // Set current pane
+                pane = plugin.pane.aml;
                 
                 // Store original info
-                originalTab      = tab;
+                originalTab      = pane;
                 originalPosition = button.nextSibling;
                 dragWidth        = button.offsetWidth;
                 
@@ -315,7 +315,7 @@ define(function(require, exports, module) {
             
             function isNotSnapped(e, container){
                 if (!container)
-                    container = tab.$buttons;
+                    container = pane.$buttons;
                 var rect = container.getBoundingClientRect();
                 
                 var x    = e.clientX;
@@ -333,45 +333,45 @@ define(function(require, exports, module) {
             function showOrderPosition(idx, toWidth, finalize, finish){
                 if (idx < 0) idx = 0;
                 
-                var orderPage = (pages[idx - 1] == page
+                var orderTab = (pages[idx - 1] == tab
                     ? pages[idx + 1]
                     : pages[idx]) || null;
                 
-                // Remove page from childNodes
-                tab.childNodes.remove(page);
+                // Remove tab from childNodes
+                pane.childNodes.remove(tab);
                 
                 if (finalize) {
                     // Get new pages with new order
-                    pages = tab.getPages();
+                    pages = pane.getTabs();
                     
                     // Reparent for real
-                    var insert = pages[idx] && pages[idx].cloud9page;
-                    plugin.attachTo(tab.cloud9tab, insert, true)
+                    var insert = pages[idx] && pages[idx].cloud9tab;
+                    plugin.attachTo(pane.cloud9pane, insert, true)
                 }
                 else {
                     // If we're already at this position do nothing
-                    if (orderPage == page)
+                    if (orderTab == tab)
                         return;
                     
-                    // Move page to new position
-                    var idx = tab.childNodes.indexOf(orderPage);
-                    if (idx > -1) tab.childNodes.splice(idx, 0, page);
-                    else tab.childNodes.push(page);
+                    // Move tab to new position
+                    var idx = pane.childNodes.indexOf(orderTab);
+                    if (idx > -1) pane.childNodes.splice(idx, 0, tab);
+                    else pane.childNodes.push(tab);
                     
-                    tab.$buttons.insertBefore(page.$button, 
-                        orderPage && orderPage.$button || btnPlus);
+                    pane.$buttons.insertBefore(tab.$button, 
+                        orderTab && orderTab.$button || btnPlus);
                 }
                 
                 // Patch + button which is changed to "" again
                 // btnPlus.style.position = "absolute";
                 // btnPlus.style.top      = "6px";
                 
-                animatePages(finish, finalize, toWidth);
+                animateTabs(finish, finalize, toWidth);
             }
             
-            function animatePages(finish, includePage, toWidth){
+            function animateTabs(finish, includeTab, toWidth){
                 // Get new pages array (with new order)
-                pages = tab.getPages();
+                pages = pane.getTabs();
                 pages.push({$button: btnPlus});
 
                 // Animate all pages to their right position
@@ -379,8 +379,8 @@ define(function(require, exports, module) {
                 for (var i = 0, l = pages.length; i < l; i++) {
                     p = pages[i];
                     
-                    // Ignore the page we are dragging
-                    if (!includePage && page === p) {
+                    // Ignore the tab we are dragging
+                    if (!includeTab && tab === p) {
                         if (p.$button.parentNode == document.body)
                             offset = 1;
                         if (toWidth) 
@@ -393,12 +393,12 @@ define(function(require, exports, module) {
                     if (toWidth || toLeft != curLeft) {
                         var tween = {
                             node     : p.$button,
-                            duration : page === p ? 0.20 : 0.15,
-                            timingFunction : page === p
+                            duration : tab === p ? 0.20 : 0.15,
+                            timingFunction : tab === p
                                 ? "cubic-bezier(.30, .08, 0, 1)"
                                 : "linear"
                         };
-                        if (includePage || page !== p)
+                        if (includeTab || tab !== p)
                             tween.left  = toLeft + "px";
                         if (toWidth && p.localName)
                             tween.width = toWidth + "px";
@@ -447,24 +447,24 @@ define(function(require, exports, module) {
                 var idx = Math.floor(x / tabWidth);
                 
                 // Show final order
-                var orderPage = showOrderPosition(idx, null, true, finish);
+                var orderTab = showOrderPosition(idx, null, true, finish);
                 
-                // Activate page
+                // Activate tab
                 plugin.activate();
                 
-                // Remove tab if empty
-                if (originalTab && canTabBeRemoved(originalTab.cloud9tab))
-                    originalTab.cloud9tab.unload();
+                // Remove pane if empty
+                if (originalTab && canTabBeRemoved(originalTab.cloud9pane))
+                    originalTab.cloud9pane.unload();
             }
             
             function showSplitPosition(e){
                 var el = document.elementFromPoint(e.clientX, e.clientY);
                 var aml = apf.findHost(el);
                 
-                while (aml && aml.localName != "tab")
+                while (aml && aml.localName != "pane")
                     aml = aml.parentNode;
                 
-                // If aml is not the tab we seek, lets abort
+                // If aml is not the pane we seek, lets abort
                 if (!aml) {
                     divSplit.style.display = "none";
                     splitTab       = null;
@@ -472,8 +472,8 @@ define(function(require, exports, module) {
                     return;
                 }
                 
-                var page = (aml.getPage() || {}).cloud9page;
-                var dark = !page || page.className.names.indexOf("dark") > -1;
+                var tab = (aml.getPage() || {}).cloud9tab;
+                var dark = !tab || tab.className.names.indexOf("dark") > -1;
                 divSplit.className = "split-area" + (dark ? " dark" : "");
                 
                 // Find the rotated quarter that we're in
@@ -489,7 +489,7 @@ define(function(require, exports, module) {
                     return false;
                 }
                 
-                // Cannot split tab that would be removed later
+                // Cannot split pane that would be removed later
                 if (aml.getPages().length === 0) { // && aml == originalTab
                     divSplit.style.display = "none";
                     splitTab       = null;
@@ -502,7 +502,7 @@ define(function(require, exports, module) {
                 var min = Math.min(left, top, right, bottom);
                 
                 // Get buttons height
-                var bHeight = tab.$buttons.offsetHeight - 1;
+                var bHeight = pane.$buttons.offsetHeight - 1;
                 
                 // Left
                 if (min == left) {
@@ -567,7 +567,7 @@ define(function(require, exports, module) {
                 showSplitPosition(e);
                 
                 if (splitTab) {
-                    splitTab = splitTab.cloud9tab;
+                    splitTab = splitTab.cloud9pane;
                     var newTab;
                     if (splitDirection == "n")
                         newTab = splitTab.vsplit();
@@ -578,23 +578,23 @@ define(function(require, exports, module) {
                     else if (splitDirection == "e")
                         newTab = splitTab.hsplit(true);
                     
-                    var oldTab = tab;
+                    var oldTab = pane;
                     plugin.attachTo(newTab, null, true);
-                    tab = newTab.aml;
+                    pane = newTab.aml;
                     
-                    if (oldTab && canTabBeRemoved(oldTab.cloud9tab)) {
-                        oldTab.cloud9tab.unload();
+                    if (oldTab && canTabBeRemoved(oldTab.cloud9pane)) {
+                        oldTab.cloud9pane.unload();
                         originalTab = null;
                     }
                 }
                 else {
-                    page.parentNode.$buttons.insertBefore(button,
+                    tab.parentNode.$buttons.insertBefore(button,
                         originalPosition);
                 }
                 
-                // Remove tab if empty
-                if (originalTab && canTabBeRemoved(originalTab.cloud9tab))
-                    originalTab.cloud9tab.unload();
+                // Remove pane if empty
+                if (originalTab && canTabBeRemoved(originalTab.cloud9pane))
+                    originalTab.cloud9pane.unload();
                 
                 finish();
             }
@@ -624,7 +624,7 @@ define(function(require, exports, module) {
         handle.freezePublicAPI({});
         
         register(null, {
-            pagebehavior: handle
+            tabinteraction: handle
         });
     }
 });
