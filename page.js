@@ -1,12 +1,9 @@
 define(function(require, exports, module) {
-    main.consumes = [
-        "Plugin", "c9", "ui", "tabManager", "ace", "anims"
-    ];
+    main.consumes = ["Plugin", "ui", "tabManager", "ace", "anims"];
     main.provides = ["tabinteraction"];
     return main;
 
     function main(options, imports, register) {
-        var c9        = imports.c9;
         var Plugin    = imports.Plugin;
         var ui        = imports.ui;
         var anims     = imports.anims;
@@ -58,7 +55,7 @@ define(function(require, exports, module) {
             for (var i = 0; i < containers.length; i++) {
                 if (ui.isChildOf(containers[i], pane.aml)) {
                     return containers[i]
-                        .getElementsByTagNameNS(apf.ns.aml, "pane").length > 1
+                        .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1
                 }
             }
             return false;
@@ -86,7 +83,7 @@ define(function(require, exports, module) {
                 
                 // Attach tab to pane
                 if (e) {
-                    var curpage  = pane.getTab();
+                    var curpage  = pane.getPage();
                     if (curpage) {
                         var curbtn = curpage.$button;
                         ui.setStyleClass(curbtn, "", ["curbtn"]);
@@ -98,7 +95,7 @@ define(function(require, exports, module) {
                 var container = pane.$buttons;
                 var nodes     = container.childNodes;
                 var rect      = container.getBoundingClientRect();
-                var btn       = (pane.getTab() || { $button: button }).$button;
+                var btn       = (pane.getPage() || { $button: button }).$button;
                 var diff      = ui.getWidthDiff(btn);
                 
                 var leftMargin   = parseInt(ui.getStyle(btn, "marginLeft"), 10) || 0;
@@ -107,7 +104,7 @@ define(function(require, exports, module) {
                 if (maxWidth > 500) maxWidth = 150;
                 
                 leftPos      = rect.left;
-                pages        = pane.getTabs();
+                pages        = pane.getPages();
                 leftPadding  = parseInt(ui.getStyle(container, "paddingLeft"), 10) || 0;
                 rightPadding = (parseInt(ui.getStyle(container, "paddingRight"), 10) || 0) + 24;
                 
@@ -167,14 +164,14 @@ define(function(require, exports, module) {
                     if (change === true) {
                         var maxTabWidth = Math.min(maxWidth + diff, 
                           ((rect.width - leftPadding - rightPadding + rightMargin) 
-                            / pane.getTabs().length) - rightMargin);
+                            / pane.getPages().length) - rightMargin);
                         tabWidth = maxTabWidth + leftMargin + rightMargin;
                         
                         var cb = clean.bind(this, false);
                         return animateTabs(cb, null, maxTabWidth - diff);
                     }
                     
-                    if (curbtn && curpage == pane.getTab()) {
+                    if (curbtn && curpage == pane.getPage()) {
                         ui.setStyleClass(curbtn, "curbtn");
                         curbtn = null;
                     }
@@ -342,7 +339,7 @@ define(function(require, exports, module) {
                 
                 if (finalize) {
                     // Get new pages with new order
-                    pages = pane.getTabs();
+                    pages = pane.getPages();
                     
                     // Reparent for real
                     var insert = pages[idx] && pages[idx].cloud9tab;
@@ -371,7 +368,7 @@ define(function(require, exports, module) {
             
             function animateTabs(finish, includeTab, toWidth){
                 // Get new pages array (with new order)
-                pages = pane.getTabs();
+                pages = pane.getPages();
                 pages.push({$button: btnPlus});
 
                 // Animate all pages to their right position
@@ -414,6 +411,7 @@ define(function(require, exports, module) {
             function mouseMoveOrder(e, toWidth){
                 if (!e) e = event;
                 
+                console.log(started);
                 if (!started) {
                     if (Math.abs(startX - e.clientX) < 4
                       && Math.abs(startY - e.clientY) < 4)
@@ -461,7 +459,7 @@ define(function(require, exports, module) {
                 var el = document.elementFromPoint(e.clientX, e.clientY);
                 var aml = apf.findHost(el);
                 
-                while (aml && aml.localName != "pane")
+                while (aml && aml.localName != "tab")
                     aml = aml.parentNode;
                 
                 // If aml is not the pane we seek, lets abort
