@@ -353,13 +353,11 @@ define(function(require, exports, module) {
                 var pane = e.pane.aml;
                 pane.on("contextmenu", function(e) {
                     if (!e.currentTarget) return;
-                    mnuContext.$tab = e.currentTarget.tagName == "tab"
+                    mnuContext.$tab = e.currentTarget.tagName == "page"
                         ? e.currentTarget.cloud9tab : null;
-                    mnuContext.$pane = e.currentTarget.tagName == "tab"
-                        ? e.currentTarget.cloud9pane : null;
                 });
                 pane.setAttribute("contextmenu", mnuContext);
-            })
+            });
     
             //@todo store the stack for availability after reload
             tabs.on("tabBeforeClose", function(e) {
