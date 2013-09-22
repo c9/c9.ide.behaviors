@@ -93,8 +93,8 @@ define(function(require, exports, module) {
             ["revealtab",      "Shift-Command-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
             ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MOREPAGES,  "navigate to the next tab in the stack of accessed tabs"],
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MOREPAGES,  "navigate to the previous tab in the stack of accessed tabs"],
-            ["nexttab",        "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of tabs"],
-            ["previoustab",    "Option-Shift-L",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous tab in the stack of tabs"],
+            ["nextpane",       "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of panes"],
+            ["previouspane",   "Option-Shift-L",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous tab in the stack of panes"],
             ["closealltotheright", "", "", function(){
                 var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
                 if (tab) {
