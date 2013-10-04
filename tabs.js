@@ -90,7 +90,7 @@ define(function(require, exports, module) {
             ["tab8",           "Command-8",        "Ctrl-8",          null,       "navigate to the eighth tab"],
             ["tab9",           "Command-9",        "Ctrl-9",          null,       "navigate to the ninth tab"],
             ["tab0",           "Command-0",        "Ctrl-0",          null,       "navigate to the tenth tab"],
-            ["revealtab",      "Shift-Command-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
+            ["revealtab",      "Command-Shift-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
             ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MOREPAGES,  "navigate to the next tab in the stack of accessed tabs"],
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MOREPAGES,  "navigate to the previous tab in the stack of accessed tabs"],
             ["nextpane",       "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of panes"],
