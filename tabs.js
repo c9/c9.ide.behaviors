@@ -202,10 +202,10 @@ define(function(require, exports, module) {
                 command : "closealltabs"
             }), 120000, plugin);
 
-            menus.addItemByPath("Window/Tabs/Close Pane", new apf.item({
+            menus.addItemByPath("Window/Tabs/Close All Tabs", new apf.item({
                 command : "closepane"
             }), 100, plugin);
-            menus.addItemByPath("Window/Tabs/Close All Tabs", new apf.item({
+            menus.addItemByPath("Window/Tabs/Close All Tabs In All Panes", new apf.item({
                 command : "closealltabs"
             }), 200, plugin);
             menus.addItemByPath("Window/Tabs/Close All But Current Tab", new apf.item({
@@ -314,9 +314,6 @@ define(function(require, exports, module) {
                 command : "closetab"
             }), 300, mnuContext, plugin);
             menus.addItemByPath("Close All Tabs", new apf.item({
-                command : "closealltabs"
-            }), 400, mnuContext, plugin);
-            menus.addItemByPath("Close All Tabs In Pane", new apf.item({
                 command : "closepane"
             }), 450, mnuContext, plugin);
             menus.addItemByPath("Close Other Tabs", new apf.item({
