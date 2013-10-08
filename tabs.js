@@ -202,7 +202,7 @@ define(function(require, exports, module) {
                 command : "closealltabs"
             }), 120000, plugin);
 
-            menus.addItemByPath("Window/Tabs/Close All Tabs", new apf.item({
+            menus.addItemByPath("Window/Tabs/Close All Tabs In Pane", new apf.item({
                 command : "closepane"
             }), 100, plugin);
             menus.addItemByPath("Window/Tabs/Close All Tabs In All Panes", new apf.item({
