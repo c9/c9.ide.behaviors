@@ -135,17 +135,19 @@ define(function(require, exports, module) {
                     list.remove(null);
                     accessList = list;
                 }
-                var list = settings.getJson("state/panecycle");
+                
+                list = settings.getJson("state/panecycle");
                 if (list) {
                     list.remove(null);
+                    paneList = list;
                 }
             });
             
             settings.on("write", function(e){
-                // @todo save menuClosedItems
+                var list;
                 
                 if (accessList.changed) {
-                    var list = [];
+                    list = [];
                     accessList.forEach(function(tab, i){
                         if (tab && tab.name)
                             list.push(tab.name);
@@ -153,8 +155,9 @@ define(function(require, exports, module) {
                     settings.setJson("state/tabcycle", list);
                     accessList.changed = false;
                 }
+                
                 if (paneList.changed) {
-                    var list = [];
+                    list = [];
                     paneList.forEach(function(tab, i){
                         if (tab && tab.name)
                             list.push(tab.name);
