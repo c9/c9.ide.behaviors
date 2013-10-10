@@ -72,22 +72,23 @@ define(function(require, exports, module) {
         
         var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab;
 
-        var ACTIVEPAGE = function(){ return tabs.focussedTab; };
-        var ACTIVEPATH = function(){ return (tabs.focussedTab || 1).path; };
-        var MOREPAGES  = function(){ return tabs.getTabs().length > 1 };
-        var MORETABS   = function(){ return tabs.getPanes().length > 1 };
+        var ACTIVEPAGE      = function(){ return tabs.focussedTab; };
+        var ACTIVEPATH      = function(){ return (tabs.focussedTab || 1).path; };
+        var MORETABS        = function(){ return tabs.getTabs().length > 1 };
+        var MORETABSINPANE  = function(){ return tabs.focussedTab && tabs.focussedTab.pane.getTabs().length > 1 };
+        var MOREPANES       = function(){ return tabs.getPanes().length > 1 };
         
         var movekey = "Command-Option-Shift"
         var definition = [
             ["closetab",       "Option-W",         "Alt-W",           ACTIVEPAGE, "close the tab that is currently active"],
             ["closealltabs",   "Option-Shift-W",   "Alt-Shift-W",     ACTIVEPAGE, "close all opened tabs"],
-            ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MOREPAGES,  "close all opened tabs, except the tab that is currently active"],
-            ["gototabright",   "Command-]",        "Ctrl-]",          MOREPAGES,  "navigate to the next tab, right to the tab that is currently active"],
-            ["gototableft",    "Command-[",        "Ctrl-[",          MOREPAGES,  "navigate to the next tab, left to the tab that is currently active"],
-            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MOREPAGES,  "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
-            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MOREPAGES,  "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
-            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MOREPAGES,  "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
-            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MOREPAGES,  "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
+            ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MORETABS,  "close all opened tabs, except the tab that is currently active"],
+            ["gototabright",   "Command-]",        "Ctrl-]",          MORETABSINPANE,  "navigate to the next tab, right to the tab that is currently active"],
+            ["gototableft",    "Command-[",        "Ctrl-[",          MORETABSINPANE,  "navigate to the next tab, left to the tab that is currently active"],
+            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MORETABS,  "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
+            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MORETABS,  "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
+            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MORETABS,  "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
+            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MORETABS,  "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
             ["tab1",           "Command-1",        "Ctrl-1",          null,       "navigate to the first tab"],
             ["tab2",           "Command-2",        "Ctrl-2",          null,       "navigate to the second tab"],
             ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
@@ -99,10 +100,10 @@ define(function(require, exports, module) {
             ["tab9",           "Command-9",        "Ctrl-9",          null,       "navigate to the ninth tab"],
             ["tab0",           "Command-0",        "Ctrl-0",          null,       "navigate to the tenth tab"],
             ["revealtab",      "Command-Shift-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
-            ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MOREPAGES,  "navigate to the next tab in the stack of accessed tabs"],
-            ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MOREPAGES,  "navigate to the previous tab in the stack of accessed tabs"],
-            ["nextpane",       "Option-ESC",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of panes"],
-            ["previouspane",   "Option-Shift-ESC",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous tab in the stack of panes"],
+            ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MORETABSINPANE,  "navigate to the next tab in the stack of accessed tabs"],
+            ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
+            ["nextpane",       "Option-ESC",         "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
+            ["previouspane",   "Option-Shift-ESC",   "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
             ["closealltotheright", "", "", function(){
                 var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
                 if (tab) {
@@ -748,13 +749,13 @@ define(function(require, exports, module) {
         }
     
         function cycleTab(dir) {
-            var pages   = tabs.getTabs();
             var curr    = tabs.focussedTab;
-            var currIdx = pages.indexOf(curr);
-            if (!curr || pages.length == 1)
+            var pages   = curr && curr.pane.getTabs();
+            if (!pages || pages.length == 1)
                 return;
     
-            var start = currIdx;
+            var currIdx = pages.indexOf(curr);
+            var start   = currIdx;
             var tab;
             
             do {
