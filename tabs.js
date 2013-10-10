@@ -226,35 +226,48 @@ define(function(require, exports, module) {
 
             menus.addItemByPath("Goto/~", new apf.divider(), 300, plugin);
 
-            menus.addItemByPath("Goto/Switch File/", null, 301, plugin);
+            menus.addItemByPath("Goto/Tab or Pane/", null, 301, plugin);
 
-            menus.addItemByPath("Goto/Switch File/Next File", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Tab to the Right", new apf.item({
                 command : "gototabright"
             }), 100, plugin);
 
-            menus.addItemByPath("Goto/Switch File/Previous File", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Tab to the Left", new apf.item({
                 command : "gototableft"
             }), 200, plugin);
 
-            menus.addItemByPath("Goto/Switch File/~", new apf.divider(), 300, plugin);
-
-            menus.addItemByPath("Goto/Switch File/Next File in Stack", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Next Tab in History", new apf.item({
                 command : "nexttab"
-            }), 400, plugin);
+            }), 300, plugin);
 
-            menus.addItemByPath("Goto/Switch File/Previous File in Stack", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Previous Tab in History", new apf.item({
                 command : "previoustab"
-            }), 500, plugin);
-
-            menus.addItemByPath("Goto/Switch File/~", new apf.divider(), 300, plugin);
-
-            menus.addItemByPath("Goto/Switch File/Next Pane in Stack", new apf.item({
-                command : "nextpane"
             }), 400, plugin);
 
-            menus.addItemByPath("Goto/Switch File/Previous Pane in Stack", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/~", new apf.divider(), 500, plugin);
+            
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Right", new apf.item({
+                command : "movetabright"
+            }), 600, plugin);
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Left", new apf.item({
+                command : "movetableft"
+            }), 700, plugin);
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Up", new apf.item({
+                command : "movetabup"
+            }), 800, plugin);
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Down", new apf.item({
+                command : "movetabdown"
+            }), 900, plugin);
+            
+            menus.addItemByPath("Goto/Tab or Pane/~", new apf.divider(), 1000, plugin);
+
+            menus.addItemByPath("Goto/Tab or Pane/Next Pane in History", new apf.item({
+                command : "nextpane"
+            }), 1100, plugin);
+
+            menus.addItemByPath("Goto/Tab or Pane/Previous Pane in History", new apf.item({
                 command : "previouspane"
-            }), 500, plugin);
+            }), 1200, plugin);
             
             // Tab Helper Menu
             menus.addItemByPath("Window/~", new ui.divider(), 10000, plugin);
