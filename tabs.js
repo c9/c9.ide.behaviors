@@ -35,28 +35,28 @@ define(function(require, exports, module) {
         var mnuContext, mnuEditors, mnuTabs;
         var menuItems = [], menuClosedItems = [];
         
-        var accessList  = [];
         var accessedTab = 0;
         
         var paneList     = [];
         var accessedPane = 0;
-        paneList.add     = function(tab, first){
+        
+        function addToPaneList(tab, first){
             var pane = tab.pane, found;
-            this.every(function(tab){
+            paneList.every(function(tab){
                 if (tab.pane && tab.pane == pane) {
                     found = tab;
                     return false;
                 }
                 return true;
             })
-            if (found) this.remove(found);
+            if (found) paneList.remove(found);
             
             if (first == 2)
-                this.splice(1, 0, tab);
+                paneList.splice(1, 0, tab);
             else if (first) 
-                this.unshift(tab) 
+                paneList.unshift(tab) 
             else 
-                this.push(tab);
+                paneList.push(tab);
         }
         
         var cycleKey     = apf.isMac ? 18 : 17;
@@ -130,13 +130,7 @@ define(function(require, exports, module) {
             settings.on("read", function(e){
                 settings.setDefaults("user/general", [["revealfile", false]]);
                 
-                var list = settings.getJson("state/tabcycle");
-                if (list) {
-                    list.remove(null);
-                    accessList = list;
-                }
-                
-                list = settings.getJson("state/panecycle");
+                var list = settings.getJson("state/panecycle");
                 if (list) {
                     list.remove(null);
                     paneList = list;
@@ -145,16 +139,6 @@ define(function(require, exports, module) {
             
             settings.on("write", function(e){
                 var list;
-                
-                if (accessList.changed) {
-                    list = [];
-                    accessList.forEach(function(tab, i){
-                        if (tab && tab.name)
-                            list.push(tab.name);
-                    });
-                    settings.setJson("state/tabcycle", list);
-                    accessList.changed = false;
-                }
                 
                 if (paneList.changed) {
                     list = [];
@@ -357,6 +341,8 @@ define(function(require, exports, module) {
                         ? e.currentTarget.cloud9tab : null;
                 });
                 pane.setAttribute("contextmenu", mnuContext);
+                if (!e.pane.meta.accessList)
+                    e.pane.meta.accessList = [];
             });
     
             //@todo store the stack for availability after reload
@@ -378,12 +364,14 @@ define(function(require, exports, module) {
             
             tabs.on("tabAfterClose", function(e) {
                 // Hack to force focus on the right pane
+                var accessList = e.tab.pane.meta.accessList;
                 if (tabs.focussedTab == e.tab && accessList[1])
                     e.tab.pane.aml.nextTabInLine = accessList[1].aml;
             });
             
             tabs.on("tabReparent", function(e) {
                 // Hack to force focus on the right pane
+                var accessList = e.tab.pane.meta.accessList;
                 if (tabs.focussedTab == e.tab && accessList[1])
                     e.lastPane.aml.nextTabInLine = accessList[1].aml;
             });
@@ -394,7 +382,7 @@ define(function(require, exports, module) {
                     return;
                     
                 addTabToClosedMenu(tab);
-                accessList.remove(tab);
+                tab.pane.meta.accessList.remove(tab);
                 paneList.remove(tab);
             });
             
@@ -412,8 +400,11 @@ define(function(require, exports, module) {
                 if (tab.document.meta.preview)
                     return;
 
+                var accessList = tab.pane.meta.accessList;
+                var idx;
+
                 if (accessList.indexOf(tab) == -1) {
-                    var idx = accessList.indexOf(tab.name);
+                    idx = accessList.indexOf(tab.name);
                     if (idx == -1) { //Load accesslist from index
                         if (tab == tabs.focussedTab)
                             accessList.unshift(tab);
@@ -424,10 +415,10 @@ define(function(require, exports, module) {
                         accessList[idx] = tab;
                 }
                 if (paneList.indexOf(tab) == -1) {
-                    var idx = paneList.indexOf(tab.name);
+                    idx = paneList.indexOf(tab.name);
                     if (idx == -1) { //Load paneList from index
                         if (tab.isActive())
-                            paneList.add(tab);
+                            addToPaneList(tab);
                     }
                     else
                         paneList[idx] = tab;
@@ -438,11 +429,12 @@ define(function(require, exports, module) {
                 var tab = e.tab;
 
                 if (!cycleKeyPressed) {
+                    var accessList = tab.pane.meta.accessList;
                     accessList.remove(tab);
                     accessList.unshift(tab);
                     accessList.changed = true;
                     
-                    paneList.add(tab, true);
+                    addToPaneList(tab, true);
                     paneList.changed = true;
                     
                     settings.save();
@@ -460,11 +452,12 @@ define(function(require, exports, module) {
                     return;
             
                 if (!cycleKeyPressed) {
+                    var accessList = tab.pane.meta.accessList;
                     accessList.remove(tab);
                     accessList.splice(1, 0, tab);
                     accessList.changed = true;
                     
-                    paneList.add(tab, 2);
+                    addToPaneList(tab, 2);
                     paneList.changed = true;
                     
                     settings.save();
@@ -485,6 +478,7 @@ define(function(require, exports, module) {
                         accessedTab = 0;
     
                         var tab = tabs.focussedTab;
+                        var accessList = tab.pane.meta.accessList;
                         if (accessList[accessedTab] != tab) {
                             accessList.remove(tab);
                             accessList.unshift(tab);
@@ -657,7 +651,10 @@ define(function(require, exports, module) {
         function nexttab(){
             if (tabs.getTabs().length === 1)
                 return;
-    
+            
+            var tab        = tabs.focussedTab;
+            var accessList = tab.pane.meta.accessList;
+            
             if (++accessedTab >= accessList.length)
                 accessedTab = 0;
     
@@ -672,6 +669,9 @@ define(function(require, exports, module) {
         function previoustab (){
             if (tabs.getTabs().length === 1)
                 return;
+                
+            var tab        = tabs.focussedTab;
+            var accessList = tab.pane.meta.accessList;
     
             if (--accessedTab < 0)
                 accessedTab = accessList.length - 1;
