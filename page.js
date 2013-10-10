@@ -308,7 +308,7 @@ define(function(require, exports, module) {
                 
                 apf.addListener(document, "mousemove", mouseMoveOrder);
                 apf.addListener(document, "mouseup", mouseUpOrder);
-            });
+            }, true);
             
             function isNotSnapped(e, container){
                 if (!container)
