@@ -58,6 +58,14 @@ define(function(require, exports, module) {
             else 
                 paneList.push(tab);
         }
+        function accessListToJson(){
+            var list = [];
+            this.forEach(function(tab, i){
+                if (tab && tab.name)
+                    list.push(tab.name);
+            });
+            return list;
+        }
         
         var cycleKey     = apf.isMac ? 18 : 17;
         var paneCycleKey = 192;
@@ -67,7 +75,7 @@ define(function(require, exports, module) {
         var ACTIVEPAGE = function(){ return tabs.focussedTab; };
         var ACTIVEPATH = function(){ return (tabs.focussedTab || 1).path; };
         var MOREPAGES  = function(){ return tabs.getTabs().length > 1 };
-        var MORETABS   = function(){ return tabs.getPanes(tabs.container).length > 1 };
+        var MORETABS   = function(){ return tabs.getPanes().length > 1 };
         
         var movekey = "Command-Option-Shift"
         var definition = [
@@ -82,7 +90,7 @@ define(function(require, exports, module) {
             ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MOREPAGES,  "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
             ["tab1",           "Command-1",        "Ctrl-1",          null,       "navigate to the first tab"],
             ["tab2",           "Command-2",        "Ctrl-2",          null,       "navigate to the second tab"],
-            ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
+            // ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
             ["tab4",           "Command-4",        "Ctrl-4",          null,       "navigate to the fourth tab"],
             ["tab5",           "Command-5",        "Ctrl-5",          null,       "navigate to the fifth tab"],
             ["tab6",           "Command-6",        "Ctrl-6",          null,       "navigate to the sixth tab"],
@@ -93,8 +101,8 @@ define(function(require, exports, module) {
             ["revealtab",      "Command-Shift-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
             ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MOREPAGES,  "navigate to the next tab in the stack of accessed tabs"],
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MOREPAGES,  "navigate to the previous tab in the stack of accessed tabs"],
-            ["nextpane",       "Option-L",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of panes"],
-            ["previouspane",   "Option-Shift-L",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous tab in the stack of panes"],
+            ["nextpane",       "Option-ESC",         "Ctrl-`",          MORETABS,   "navigate to the next tab in the stack of panes"],
+            ["previouspane",   "Option-Shift-ESC",   "Ctrl-Shift-`",    MORETABS,   "navigate to the previous tab in the stack of panes"],
             ["closealltotheright", "", "", function(){
                 var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
                 if (tab) {
@@ -341,8 +349,12 @@ define(function(require, exports, module) {
                         ? e.currentTarget.cloud9tab : null;
                 });
                 pane.setAttribute("contextmenu", mnuContext);
-                if (!e.pane.meta.accessList)
-                    e.pane.meta.accessList = [];
+                
+                var meta = e.pane.meta;
+                if (!meta.accessList)
+                    meta.accessList = [];
+                if (!meta.accessList.toJson)
+                    meta.accessList.toJson = accessListToJson;
             });
     
             //@todo store the stack for availability after reload
@@ -425,7 +437,7 @@ define(function(require, exports, module) {
                 }
             });
     
-            tabs.on("focus", function(e){
+            tabs.on("focusSync", function(e){
                 var tab = e.tab;
 
                 if (!cycleKeyPressed) {
@@ -685,7 +697,7 @@ define(function(require, exports, module) {
         }
     
         function nextpane(){
-            if (tabs.getPanes(tabs.container).length === 1)
+            if (tabs.getPanes().length === 1)
                 return;
     
             if (++accessedPane >= paneList.length)
@@ -694,13 +706,13 @@ define(function(require, exports, module) {
             var next = paneList[accessedPane];
             if (typeof next != "object" || !next.pane.visible)
                 return nextpane();
-            tabs.focusTab(next, null, true);
+            tabs.focusTab(next.pane.activeTab, null, true);
     
             dirtyNextTab = true;
         }
     
         function previouspane(){
-            if (tabs.getTabs(tabs.container).length === 1)
+            if (tabs.getTabs().length === 1)
                 return;
     
             if (--accessedPane < 0)
@@ -709,7 +721,7 @@ define(function(require, exports, module) {
             var next = paneList[accessedPane];
             if (typeof next != "object" || !next.pane.visible)
                 return previouspane();
-            tabs.focusTab(next, null, true);
+            tabs.focusTab(next.pane.activeTab, null, true);
     
             dirtyNextTab = true;
         }
