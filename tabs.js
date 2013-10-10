@@ -90,7 +90,7 @@ define(function(require, exports, module) {
             ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MOREPAGES,  "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
             ["tab1",           "Command-1",        "Ctrl-1",          null,       "navigate to the first tab"],
             ["tab2",           "Command-2",        "Ctrl-2",          null,       "navigate to the second tab"],
-            // ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
+            ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
             ["tab4",           "Command-4",        "Ctrl-4",          null,       "navigate to the fourth tab"],
             ["tab5",           "Command-5",        "Ctrl-5",          null,       "navigate to the fifth tab"],
             ["tab6",           "Command-6",        "Ctrl-6",          null,       "navigate to the sixth tab"],
@@ -189,32 +189,32 @@ define(function(require, exports, module) {
             });
             
             // General Menus
-            menus.addItemByPath("File/~", new apf.divider(), 100000, plugin);
-            menus.addItemByPath("File/Close File", new apf.item({
+            menus.addItemByPath("File/~", new ui.divider(), 100000, plugin);
+            menus.addItemByPath("File/Close File", new ui.item({
                 command: "closetab"
             }), 110000, plugin);
-            menus.addItemByPath("File/Close All Files", new apf.item({
+            menus.addItemByPath("File/Close All Files", new ui.item({
                 command : "closealltabs"
             }), 120000, plugin);
 
-            menus.addItemByPath("Window/Tabs/Close All Tabs In Pane", new apf.item({
+            menus.addItemByPath("Window/Tabs/Close All Tabs In Pane", new ui.item({
                 command : "closepane"
             }), 100, plugin);
-            menus.addItemByPath("Window/Tabs/Close All Tabs In All Panes", new apf.item({
+            menus.addItemByPath("Window/Tabs/Close All Tabs In All Panes", new ui.item({
                 command : "closealltabs"
             }), 200, plugin);
-            menus.addItemByPath("Window/Tabs/Close All But Current Tab", new apf.item({
+            menus.addItemByPath("Window/Tabs/Close All But Current Tab", new ui.item({
                 command : "closeallbutme"
             }), 300, plugin);
             
-            menus.addItemByPath("Window/Tabs/~", new apf.divider(), 1000000, plugin);
-            menus.addItemByPath("Window/Tabs/Split Pane Vertically", new apf.item({
+            menus.addItemByPath("Window/Tabs/~", new ui.divider(), 1000000, plugin);
+            menus.addItemByPath("Window/Tabs/Split Pane Vertically", new ui.item({
                 command : "vsplit"
             }), 1000100, plugin);
-            menus.addItemByPath("Window/Tabs/Split Pane Horizontally", new apf.item({
+            menus.addItemByPath("Window/Tabs/Split Pane Horizontally", new ui.item({
                 command : "hsplit"
             }), 1000200, plugin);
-            menus.addItemByPath("Window/Tabs/~", new apf.divider(), 1000300, plugin);
+            menus.addItemByPath("Window/Tabs/~", new ui.divider(), 1000300, plugin);
             
             menus.addItemByPath("Window/Tabs/~", new apf.label({
                 "class"   : "splits",
@@ -232,48 +232,48 @@ define(function(require, exports, module) {
                 }
             }), 1000400, plugin);
 
-            menus.addItemByPath("Goto/~", new apf.divider(), 300, plugin);
+            menus.addItemByPath("Goto/~", new ui.divider(), 300, plugin);
 
             menus.addItemByPath("Goto/Tab or Pane/", null, 301, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Tab to the Right", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Tab to the Right", new ui.item({
                 command : "gototabright"
             }), 100, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Tab to the Left", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Tab to the Left", new ui.item({
                 command : "gototableft"
             }), 200, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Next Tab in History", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Next Tab in History", new ui.item({
                 command : "nexttab"
             }), 300, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Previous Tab in History", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Previous Tab in History", new ui.item({
                 command : "previoustab"
             }), 400, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/~", new apf.divider(), 500, plugin);
+            menus.addItemByPath("Goto/Tab or Pane/~", new ui.divider(), 500, plugin);
             
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Right", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Right", new ui.item({
                 command : "movetabright"
             }), 600, plugin);
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Left", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Left", new ui.item({
                 command : "movetableft"
             }), 700, plugin);
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Up", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Up", new ui.item({
                 command : "movetabup"
             }), 800, plugin);
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Down", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Down", new ui.item({
                 command : "movetabdown"
             }), 900, plugin);
             
-            menus.addItemByPath("Goto/Tab or Pane/~", new apf.divider(), 1000, plugin);
+            menus.addItemByPath("Goto/Tab or Pane/~", new ui.divider(), 1000, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Next Pane in History", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Next Pane in History", new ui.item({
                 command : "nextpane"
             }), 1100, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Previous Pane in History", new apf.item({
+            menus.addItemByPath("Goto/Tab or Pane/Previous Pane in History", new ui.item({
                 command : "previouspane"
             }), 1200, plugin);
             
@@ -314,31 +314,31 @@ define(function(require, exports, module) {
 
             mnuContext.on("prop.visible", removeContextInfo, false);
     
-            menus.addItemByPath("Reveal in File Tree", new apf.item({
+            menus.addItemByPath("Reveal in File Tree", new ui.item({
                 command : "revealtab"
             }), 100, mnuContext, plugin);
-            menus.addItemByPath("~", new apf.divider(), 200, mnuContext, plugin);
-            menus.addItemByPath("Close Tab", new apf.item({
+            menus.addItemByPath("~", new ui.divider(), 200, mnuContext, plugin);
+            menus.addItemByPath("Close Tab", new ui.item({
                 command : "closetab"
             }), 300, mnuContext, plugin);
-            menus.addItemByPath("Close All Tabs", new apf.item({
+            menus.addItemByPath("Close All Tabs", new ui.item({
                 command : "closepane"
             }), 450, mnuContext, plugin);
-            menus.addItemByPath("Close Other Tabs", new apf.item({
+            menus.addItemByPath("Close Other Tabs", new ui.item({
                 command : "closeallbutme"
             }), 500, mnuContext, plugin);
-            menus.addItemByPath("~", new apf.divider(), 550, mnuContext, plugin);
-            menus.addItemByPath("Close Tabs to the Right", new apf.item({
+            menus.addItemByPath("~", new ui.divider(), 550, mnuContext, plugin);
+            menus.addItemByPath("Close Tabs to the Right", new ui.item({
                 command : "closealltotheright"
             }), 600, mnuContext, plugin);
-            menus.addItemByPath("Close Tabs to the Left", new apf.item({
+            menus.addItemByPath("Close Tabs to the Left", new ui.item({
                 command : "closealltotheleft"
             }), 700, mnuContext, plugin);
-            menus.addItemByPath("~", new apf.divider(), 750, mnuContext, plugin);
-            menus.addItemByPath("Split Pane Vertically", new apf.item({
+            menus.addItemByPath("~", new ui.divider(), 750, mnuContext, plugin);
+            menus.addItemByPath("Split Pane Vertically", new ui.item({
                 command : "vsplit"
             }), 800, mnuContext, plugin);
-            menus.addItemByPath("Split Pane Horizontally", new apf.item({
+            menus.addItemByPath("Split Pane Horizontally", new ui.item({
                 command : "hsplit"
             }), 900, mnuContext, plugin);
             
@@ -1112,7 +1112,7 @@ define(function(require, exports, module) {
             var mnu, tab;
             
             // Create new divider
-            menus.addItemToMenu(mnuTabs, mnu = new apf.divider(), start, false);
+            menus.addItemToMenu(mnuTabs, mnu = new ui.divider(), start, false);
             menuItems.push(mnu);
             
             // Create new items
@@ -1120,7 +1120,7 @@ define(function(require, exports, module) {
             for (var i = 0; i < length; i++) {
                 tab = pages[i];
                 if (!tab.title) continue;
-                menus.addItemToMenu(mnuTabs, mnu = new apf.item({
+                menus.addItemToMenu(mnuTabs, mnu = new ui.item({
                     caption : tab.title,
                     relPage : tab,
                     command : "tab" + (i == 9 ? 0 : i + 1),
@@ -1130,7 +1130,7 @@ define(function(require, exports, module) {
             }
             
             if (pages.length > length) {
-                menus.addItemToMenu(mnuTabs, mnu = new apf.item({
+                menus.addItemToMenu(mnuTabs, mnu = new ui.item({
                     caption : "More...",
                     onclick : function() {
                         panels.activate("openfiles");
