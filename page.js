@@ -45,6 +45,8 @@ define(function(require, exports, module) {
                     e.tab.pane.unload();
                 }
             }, handle);
+            
+            ui.insertCss("* { }", handle);
         }
         
         function canTabBeRemoved(pane, min){
@@ -215,6 +217,7 @@ define(function(require, exports, module) {
                         divButton = document.createElement("div");
                         document.body.appendChild(divButton);
                     }
+                    
                     var theme = aceHandle.theme || {};
                     divButton.className = 
                         (theme.isDark ? "dark " : "") + (theme.cssClass || "");
@@ -222,6 +225,8 @@ define(function(require, exports, module) {
                     
                     // Remove from parent childNodes
                     pane.childNodes.remove(tab);
+                    
+                    ui.setStyleRule("*", "cursor", "default!important");
                 }
                 
                 apf.addListener(document, "mousemove", mouseMoveSplit);
@@ -240,6 +245,8 @@ define(function(require, exports, module) {
                     button.style.position = "";
                     
                     divSplit.style.display = "none";
+                    
+                    ui.setStyleRule("*", "cursor", "");
                     
                     apf.removeListener(document, "mousemove", mouseMoveSplit);
                     apf.removeListener(document, "mouseup", mouseUpSplit);
@@ -351,7 +358,7 @@ define(function(require, exports, module) {
                         return;
                     
                     // Move tab to new position
-                    var idx = pane.childNodes.indexOf(orderTab);
+                    idx = pane.childNodes.indexOf(orderTab);
                     if (idx > -1) pane.childNodes.splice(idx, 0, tab);
                     else pane.childNodes.push(tab);
                     

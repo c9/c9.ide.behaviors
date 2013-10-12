@@ -38,6 +38,7 @@
     z-index: 100000;
     pointer-events: none;
     box-sizing: border-box;
+    cursor : default;
 }
 
 .dark.split-area {
