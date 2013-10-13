@@ -40,33 +40,6 @@ define(function(require, exports, module) {
         var paneList     = [];
         var accessedPane = 0;
         
-        function addToPaneList(tab, first){
-            var pane = tab.pane, found;
-            paneList.every(function(tab){
-                if (tab.pane && tab.pane == pane) {
-                    found = tab;
-                    return false;
-                }
-                return true;
-            })
-            if (found) paneList.remove(found);
-            
-            if (first == 2)
-                paneList.splice(1, 0, tab);
-            else if (first) 
-                paneList.unshift(tab) 
-            else 
-                paneList.push(tab);
-        }
-        function accessListToJson(){
-            var list = [];
-            this.forEach(function(tab, i){
-                if (tab && tab.name)
-                    list.push(tab.name);
-            });
-            return list;
-        }
-        
         var cycleKey     = apf.isMac ? 18 : 17;
         var paneCycleKey = 192;
         
@@ -418,8 +391,11 @@ define(function(require, exports, module) {
                 if (tab.title) {
                     // @todo candidate for optimization using a hash
                     for (var i = menuClosedItems.length - 1; i >= 0; i--) {
-                        if (menuClosedItems[i].caption == tab.title)
+                        if (menuClosedItems[i].caption == tab.title) {
                             menuClosedItems.splice(i, 1)[0].destroy(true, true);
+                            if (!menuClosedItems.length)
+                                menuClosedItems.hide();
+                        }
                     }
                 }
                 
@@ -549,6 +525,36 @@ define(function(require, exports, module) {
         }
         
         /***** Methods *****/
+        
+        function addToPaneList(tab, first){
+            var pane = tab.pane, found;
+            paneList.every(function(tab){
+                if (tab.pane && tab.pane == pane) {
+                    found = tab;
+                    return false;
+                }
+                return true;
+            });
+            
+            if (found) 
+                paneList.remove(found);
+            
+            if (first == 2)
+                paneList.splice(1, 0, tab);
+            else if (first) 
+                paneList.unshift(tab);
+            else 
+                paneList.push(tab);
+        }
+        
+        function accessListToJson(){
+            var list = [];
+            this.forEach(function(tab, i){
+                if (tab && tab.name)
+                    list.push(tab.name);
+            });
+            return list;
+        }
             
         function closetab(tab) {
             if (!tab)
@@ -1074,7 +1080,7 @@ define(function(require, exports, module) {
                     item.destroy(true, true);
                     
                     // Clear label and divider if there are no items
-                    if (menuClosedItems.length == 0)
+                    if (menuClosedItems.length === 0)
                         menuClosedItems.hide();
                 }
             });
