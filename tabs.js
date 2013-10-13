@@ -929,13 +929,18 @@ define(function(require, exports, module) {
             state.sibling  = nodes[state.far ? 0 : 1];
             state.getState = function(){ return state };
             state.restore  = function(state){ 
-                var pane     = state.sibling;
-                if (pane && pane.clou9tab) 
-                    pane = pane.cloud9pane.aml;
-                var newtab  = state.pane[state.type](state.far, null, pane);
+                // pane was not being used. Why?
+                // var pane     = state.sibling;
+                // if (pane && pane.cloud9pane) 
+                //     pane = pane.cloud9pane.aml;
+                    
+                var oldpane = state.pane;
+                var newpane = oldpane.getTabs().length === 0
+                    ? oldpane
+                    : oldpane[state.type](state.far, null, pane);
                 
                 state.forEach(function(s){
-                    s.pane = newtab;
+                    s.pane = newpane;
                     tabs.open(s, function(){});
                 });
             };
