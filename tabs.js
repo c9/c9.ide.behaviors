@@ -597,7 +597,7 @@ define(function(require, exports, module) {
             unchangedTabs = [];
     
             if (!pages)
-                pages = tabs.getTabs();
+                pages = tabs.getTabs(tabs.container);
     
             var tab;
             for (var i = 0, l = pages.length; i < l; i++) {
