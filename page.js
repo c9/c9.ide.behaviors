@@ -45,6 +45,8 @@ define(function(require, exports, module) {
                     e.tab.pane.unload();
                 }
             }, handle);
+            
+            ui.insertCss("* { }", handle);
         }
         
         function canTabBeRemoved(pane, min){
@@ -63,7 +65,7 @@ define(function(require, exports, module) {
         
         function addInteraction(plugin){
             var tab    = plugin.aml;
-            var button  = tab.$button;
+            var button = tab.$button;
             if (!button) return;
 
             var offsetX, offsetY, startX, startY, dragWidth;
@@ -113,9 +115,9 @@ define(function(require, exports, module) {
                     / (pages.length + (e ? 1 : 0))) - rightMargin); // If 'e' is set, we're adding another tab to this pane
                 var newTabWidth = maxTabWidth - diff;
                 
-                tabWidth     = maxTabWidth + leftMargin + rightMargin;
+                tabWidth = maxTabWidth + leftMargin + rightMargin;
                 
-                // Get the positions info of the pane buttons
+                // Get the positions info of the tab buttons
                 var info = [];
                 for (var i = nodes.length - 1; i >= 0; i--) {
                     if ((btn = nodes[i]).nodeType != 1) continue;
@@ -156,6 +158,9 @@ define(function(require, exports, module) {
                 apf.addListener(document, "mouseup", mouseUpOrder);
                 
                 clean = function(change, callback){
+                    if (mode == "order")
+                        return;
+                    
                     if (change !== false) {
                         apf.removeListener(document, "mousemove", mouseMoveOrder);
                         apf.removeListener(document, "mouseup", mouseUpOrder);
@@ -183,8 +188,8 @@ define(function(require, exports, module) {
                         btn.style.width    = 
                         btn.style.margin   = 
                         btn.style.position = "";
-                    };
-                }
+                    }
+                };
             }
             
             function setSplitMode(e){
@@ -208,13 +213,14 @@ define(function(require, exports, module) {
                     button.style.left     = (rect.left) + "px";
                     button.style.top      = (rect.top) + "px";
                     button.style.width    = (dragWidth - ui.getWidthDiff(button)) + "px";
-                    button.style.position = "absolute"
+                    button.style.position = "absolute";
                     
                     // Attach tab to body
                     if (!divButton) {
                         divButton = document.createElement("div");
                         document.body.appendChild(divButton);
                     }
+                    
                     var theme = aceHandle.theme || {};
                     divButton.className = 
                         (theme.isDark ? "dark " : "") + (theme.cssClass || "");
@@ -222,7 +228,9 @@ define(function(require, exports, module) {
                     
                     // Remove from parent childNodes
                     pane.childNodes.remove(tab);
-                }
+                    
+                    ui.setStyleRule("*", "cursor", "default!important");
+                };
                 
                 apf.addListener(document, "mousemove", mouseMoveSplit);
                 apf.addListener(document, "mouseup", mouseUpSplit);
@@ -240,6 +248,8 @@ define(function(require, exports, module) {
                     button.style.position = "";
                     
                     divSplit.style.display = "none";
+                    
+                    ui.setStyleRule("*", "cursor", "");
                     
                     apf.removeListener(document, "mousemove", mouseMoveSplit);
                     apf.removeListener(document, "mouseup", mouseUpSplit);
@@ -351,7 +361,7 @@ define(function(require, exports, module) {
                         return;
                     
                     // Move tab to new position
-                    var idx = pane.childNodes.indexOf(orderTab);
+                    idx = pane.childNodes.indexOf(orderTab);
                     if (idx > -1) pane.childNodes.splice(idx, 0, tab);
                     else pane.childNodes.push(tab);
                     
@@ -399,6 +409,7 @@ define(function(require, exports, module) {
                             tween.left  = toLeft + "px";
                         if (toWidth && p.localName)
                             tween.width = toWidth + "px";
+                        
                         tweens.push(tween);
                     }
                 }
