@@ -1189,6 +1189,11 @@ define(function(require, exports, module) {
             /**
              * 
              */
+            get contextMenu(){ return mnuContext; },
+            
+            /**
+             * 
+             */
             closetab : closetab,
             
             /**
