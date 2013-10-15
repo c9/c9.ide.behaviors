@@ -157,10 +157,10 @@ define(function(require, exports, module) {
                 apf.addListener(document, "mousemove", mouseMoveOrder);
                 apf.addListener(document, "mouseup", mouseUpOrder);
                 
-                clean = function(change, callback){
-                    if (mode == "order")
+                clean = function(change, callback, force){
+                    if (!force && mode == "order")
                         return;
-                    
+                        
                     if (change !== false) {
                         apf.removeListener(document, "mousemove", mouseMoveOrder);
                         apf.removeListener(document, "mouseup", mouseUpOrder);
@@ -264,7 +264,7 @@ define(function(require, exports, module) {
             
             function finish(){
                 if (!initMouse) {
-                    clean();
+                    clean(null, null, true);
                     
                     button.style.zIndex        = 
                     button.style.pointerEvents = "";
