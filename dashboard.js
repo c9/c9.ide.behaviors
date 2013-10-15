@@ -22,10 +22,7 @@ define(function(require, exports, module) {
             
             // @todo how to make sure this happens only once?
             var css = require("text!./style.css")
-                .replace(/icons\//g, options.staticPrefix + "/icons/")
-                .replace(/images\//g, options.staticPrefix + "/images/");
-            
-            ui.insertCss(css, handle);
+            ui.insertCss(css, options.staticPrefix, handle);
 
             dashboard.on("widgetCreate", function(e){
                 if (e.widget.dashboard.configurable)
