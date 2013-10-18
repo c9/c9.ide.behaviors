@@ -443,7 +443,7 @@ define(function(require, exports, module) {
                 }
     
                 // @todo panel switch
-                if (settings.get("user/panels/@active") == "tree" 
+                if (tree.area && tree.area.activePanel == "tree" 
                   && settings.getBool('user/general/@revealfile')) {
                     revealtab(tab, true);
                 }
