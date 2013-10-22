@@ -331,11 +331,15 @@ define(function(require, exports, module) {
             tabs.on("paneCreate", function(e){
                 var pane = e.pane.aml;
                 pane.on("contextmenu", function(e) {
-                    if (!e.currentTarget) return;
-                    mnuContext.$tab = e.currentTarget.tagName == "page"
-                        ? e.currentTarget.cloud9tab : null;
+                    if (e.currentTarget) {
+                        mnuContext.$tab = e.currentTarget.tagName == "page"
+                            ? e.currentTarget.cloud9tab : null;
+                    }
+                    if (ui.isChildOf(pane.$buttons, e.htmlEvent.target, true)) {
+                        mnuContext.display(e.x, e.y);
+                        return false;
+                    }
                 });
-                pane.setAttribute("contextmenu", mnuContext);
                 
                 var meta = e.pane.meta;
                 if (!meta.accessList)
