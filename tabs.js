@@ -51,7 +51,7 @@ define(function(require, exports, module) {
         var MORETABSINPANE  = function(){ return tabs.focussedTab && tabs.focussedTab.pane.getTabs().length > 1 };
         var MOREPANES       = function(){ return tabs.getPanes().length > 1 };
         
-        var movekey = "Command-Option-Shift"
+        var movekey = "Command-Option-Shift";
         var definition = [
             ["closetab",       "Option-W",         "Alt-W",           ACTIVEPAGE, "close the tab that is currently active"],
             ["closealltabs",   "Option-Shift-W",   "Alt-Shift-W",     ACTIVEPAGE, "close all opened tabs"],
@@ -599,9 +599,11 @@ define(function(require, exports, module) {
     
             changedTabs   = [];
             unchangedTabs = [];
+            
+            var container = ignore && ignore.aml.parentNode || tabs.container;
     
             if (!pages)
-                pages = tabs.getTabs(tabs.container);
+                pages = tabs.getTabs(container);
     
             var tab;
             for (var i = 0, l = pages.length; i < l; i++) {
