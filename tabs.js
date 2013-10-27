@@ -587,31 +587,22 @@ define(function(require, exports, module) {
             checkTabRender(callback);
         }
     
-        function closeallbutme(ignore, pages, callback) {
-            // if ignore isn't a tab instance, then fallback to current tab, 
-            // unless it's an object from closealltotheright/left
-            if (!ignore || ignore.type != "tab") {
-                if (typeof ignore === "undefined" 
-                  || typeof ignore.closeall === "undefined") {
-                    ignore = mnuContext.$tab || tabs.focussedTab;
-                }
+        function closeallbutme(me, pages, callback) {
+            if (!me) {
+                me = mnuContext.$tab || tabs.focussedTab;
             }
     
             changedTabs   = [];
             unchangedTabs = [];
             
-            var container = ignore && ignore.aml && ignore.aml.parentNode || tabs.container;
-    
-            if (!pages)
+            if (!pages) {
+                var container = me && me.aml && me.aml.parentNode || tabs.container;
                 pages = tabs.getTabs(container);
-    
+            }
             var tab;
             for (var i = 0, l = pages.length; i < l; i++) {
                 tab = pages[i];
-    
-                if (ignore && (tab == ignore || ignore.hasOwnProperty(i)))
-                    continue;
-                else
+                if (tab !== me)
                     closepage(tab, callback);
             }
     
@@ -660,14 +651,8 @@ define(function(require, exports, module) {
                 
             var pages   = tab.pane.getTabs();
             var currIdx = pages.indexOf(tab);
-            var ignore  = {};
-    
-            for (var j = 0; j <= currIdx; j++) {
-                ignore[j] = tab;
-            }
-    
-            ignore.closeall = true;
-            closeallbutme(ignore, pages);
+            
+            closeallbutme(tab, pages.slice(currIdx));
         }
     
         function closealltotheleft(tab) {
@@ -676,14 +661,8 @@ define(function(require, exports, module) {
                 
             var pages   = tab.pane.getTabs();
             var currIdx = pages.indexOf(tab);
-            var ignore  = {};
-    
-            for (var j = pages.length - 1; j >= currIdx; j--) {
-                ignore[j] = tab;
-            }
-    
-            ignore.closeall = true;
-            closeallbutme(ignore, pages);
+            
+            closeallbutme(tab, pages.slice(0, currIdx));
         }
     
         function nexttab(){
