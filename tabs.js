@@ -600,7 +600,7 @@ define(function(require, exports, module) {
             changedTabs   = [];
             unchangedTabs = [];
             
-            var container = ignore && ignore.aml.parentNode || tabs.container;
+            var container = ignore && ignore.aml && ignore.aml.parentNode || tabs.container;
     
             if (!pages)
                 pages = tabs.getTabs(container);
