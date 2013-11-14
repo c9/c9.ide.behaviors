@@ -395,7 +395,7 @@ define(function(require, exports, module) {
                         continue;
                     }
                     
-                    var toLeft  = leftPadding + ((i - offset) * tabWidth) + (!p.localName ? 9 : 0);
+                    var toLeft  = leftPadding + ((i - offset) * tabWidth) + (!p.localName ? 11 : 0);
                     var curLeft = p.$button.offsetLeft;
                     if (toWidth || toLeft != curLeft) {
                         var tween = {
