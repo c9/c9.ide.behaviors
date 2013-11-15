@@ -382,7 +382,7 @@ define(function(require, exports, module) {
                 pages.push({$button: btnPlus});
 
                 // Animate all pages to their right position
-                var p, tweens = [], offset = 0;
+                var p, tweens = [], offset = 0, total = leftPadding;
                 for (var i = 0, l = pages.length; i < l; i++) {
                     p = pages[i];
                     
@@ -395,7 +395,7 @@ define(function(require, exports, module) {
                         continue;
                     }
                     
-                    var toLeft  = leftPadding + ((i - offset) * tabWidth) + (!p.localName ? 11 : 0);
+                    var toLeft  = total + ((i - offset) * tabWidth) + (!p.localName ? 12 : 0);
                     var curLeft = p.$button.offsetLeft;
                     if (toWidth || toLeft != curLeft) {
                         var tween = {
@@ -412,6 +412,8 @@ define(function(require, exports, module) {
                         
                         tweens.push(tween);
                     }
+                    
+                    total += p.$button.offsetWidth;
                 }
                 
                 anims.animateMultiple(tweens, function(){
