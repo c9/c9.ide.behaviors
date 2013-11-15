@@ -83,6 +83,8 @@ define(function(require, exports, module) {
                 mode = "order";
                 clean && clean();
                 
+                var lastPane = pane;
+                
                 // Set new pane
                 pane = toTab;
                 
@@ -129,10 +131,10 @@ define(function(require, exports, module) {
                 for (var i = nodes.length - 1; i >= 0; i--) {
                     if ((btn = nodes[i]).nodeType != 1) continue;
                     info.push([btn, btn.offsetLeft, btn.offsetTop, btn.offsetWidth]);
-                };
+                }
                 
                 // Append the button to the button container
-                if (e) {
+                if (e || addOne) {
                     pane.$buttons.appendChild(button);
                     info.push([button, 0, button.offsetTop, dragWidth]);
                 }
@@ -152,14 +154,14 @@ define(function(require, exports, module) {
                     // Remove from childNodes of old pane
                     var lastIndex = pane.childNodes.indexOf(tab);
                     pane.childNodes.remove(tab);
-                }
+                };
                 
                 if (started)
                     start();
                 
                 // Set initial position
-                if (e)
-                    mouseMoveOrder(e, newTabWidth);
+                if (e || addOne)
+                    mouseMoveOrder(e, newTabWidth, lastPane == pane);
                 
                 apf.addListener(document, "mousemove", mouseMoveOrder);
                 apf.addListener(document, "mouseup", mouseUpOrder);
@@ -184,7 +186,7 @@ define(function(require, exports, module) {
                         return animateTabs(cb, null, maxTabWidth - diff);
                     }
                     
-                    if (curbtn && curpage == pane.getPage()) {
+                    if (curbtn && curpage == curpage.parentNode.getPage()) {
                         ui.setStyleClass(curbtn, "curbtn");
                         curbtn = null;
                     }
@@ -431,7 +433,7 @@ define(function(require, exports, module) {
                 });
             }
             
-            function mouseMoveOrder(e, toWidth){
+            function mouseMoveOrder(e, toWidth, finalize){
                 if (!e) e = event;
                 
                 if (!started) {
@@ -451,7 +453,7 @@ define(function(require, exports, module) {
                 var x   = button.offsetLeft - leftPadding + (tabWidth / 2);
                 var idx = Math.floor(x / tabWidth);
                 
-                showOrderPosition(idx, toWidth);
+                showOrderPosition(idx, toWidth, finalize);
             }
             
             function mouseUpOrder(e){
