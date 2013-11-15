@@ -74,6 +74,12 @@ define(function(require, exports, module) {
             var pages, clean, originalPosition, splitDirection, splitTab;
             
             function setOrderMode(toTab, e){
+                if (toTab.isOrderCleaned === false) {
+                    return setTimeout(function(){
+                        setOrderMode(toTab, e);
+                    }, 10);
+                }
+                
                 mode = "order";
                 clean && clean();
                 
@@ -85,7 +91,7 @@ define(function(require, exports, module) {
                 
                 // Attach tab to pane
                 if (e) {
-                    var curpage  = pane.getPage();
+                    var curpage = pane.getPage();
                     if (curpage) {
                         var curbtn = curpage.$button;
                         ui.setStyleClass(curbtn, "", ["curbtn"]);
@@ -100,19 +106,20 @@ define(function(require, exports, module) {
                 var btn       = (pane.getPage() || { $button: button }).$button;
                 var diff      = ui.getWidthDiff(btn);
                 
-                var leftMargin   = parseInt(ui.getStyle(btn, "marginLeft"), 10) || 0;
-                var rightMargin  = parseInt(ui.getStyle(btn, "marginRight"), 10) || 0;
-                var maxWidth     = parseInt(ui.getStyle(btn, "maxWidth"), 10) || 150;
+                var leftMargin  = parseInt(ui.getStyle(btn, "marginLeft"), 10) || 0;
+                var rightMargin = parseInt(ui.getStyle(btn, "marginRight"), 10) || 0;
+                var maxWidth    = parseInt(ui.getStyle(btn, "maxWidth"), 10) || 150;
                 if (maxWidth > 500) maxWidth = 150;
                 
                 leftPos      = rect.left;
                 pages        = pane.getPages();
                 leftPadding  = parseInt(ui.getStyle(container, "paddingLeft"), 10) || 0;
                 rightPadding = (parseInt(ui.getStyle(container, "paddingRight"), 10) || 0) + 24;
-                
+
+                var addOne = pages.indexOf(tab) == -1;
                 var maxTabWidth = Math.min(maxWidth + diff, 
                   ((rect.width - leftPadding - rightPadding + rightMargin) 
-                    / (pages.length + (e ? 1 : 0))) - rightMargin); // If 'e' is set, we're adding another tab to this pane
+                    / (pages.length + (addOne ? 1 : 0))) - rightMargin);
                 var newTabWidth = maxTabWidth - diff;
                 
                 tabWidth = maxTabWidth + leftMargin + rightMargin;
@@ -157,9 +164,10 @@ define(function(require, exports, module) {
                 apf.addListener(document, "mousemove", mouseMoveOrder);
                 apf.addListener(document, "mouseup", mouseUpOrder);
                 
-                clean = function(change, callback, force){
-                    if (!force && mode == "order")
-                        return;
+                clean = function(change, toTab){
+                    if (!toTab)
+                        toTab = pane;
+                    toTab.isOrderCleaned = false;
                         
                     if (change !== false) {
                         apf.removeListener(document, "mousemove", mouseMoveOrder);
@@ -172,7 +180,7 @@ define(function(require, exports, module) {
                             / pane.getPages().length) - rightMargin);
                         tabWidth = maxTabWidth + leftMargin + rightMargin;
                         
-                        var cb = clean.bind(this, false);
+                        var cb = clean.bind(this, false, toTab);
                         return animateTabs(cb, null, maxTabWidth - diff);
                     }
                     
@@ -189,6 +197,8 @@ define(function(require, exports, module) {
                         btn.style.margin   = 
                         btn.style.position = "";
                     }
+                    
+                    toTab.isOrderCleaned = true;
                 };
             }
             
@@ -380,9 +390,9 @@ define(function(require, exports, module) {
                 // Get new pages array (with new order)
                 pages = pane.getPages();
                 pages.push({$button: btnPlus});
-
+                
                 // Animate all pages to their right position
-                var p, tweens = [], offset = 0, total = leftPadding;
+                var p, tweens = [], offset = 0;
                 for (var i = 0, l = pages.length; i < l; i++) {
                     p = pages[i];
                     
@@ -394,9 +404,11 @@ define(function(require, exports, module) {
                             p.$button.style.width = toWidth + "px";
                         continue;
                     }
-                    
-                    var toLeft  = total + ((i - offset) * tabWidth) + (!p.localName ? 12 : 0);
+
                     var curLeft = p.$button.offsetLeft;
+                    var toLeft  = leftPadding + ((i - offset) * tabWidth) 
+                        + (!p.localName ? 11 : 0);
+                        
                     if (toWidth || toLeft != curLeft) {
                         var tween = {
                             node     : p.$button,
@@ -412,8 +424,6 @@ define(function(require, exports, module) {
                         
                         tweens.push(tween);
                     }
-                    
-                    total += p.$button.offsetWidth;
                 }
                 
                 anims.animateMultiple(tweens, function(){
