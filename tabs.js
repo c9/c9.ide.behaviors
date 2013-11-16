@@ -1049,9 +1049,6 @@ define(function(require, exports, module) {
                 // the same. The solution would be to have a 
                 // way to compare the saved document to the 
                 // loaded document that created the state
-                console.warn(tab.document.meta.timestamp, stat.mtime, 
-                    tab.document.meta.timestamp - stat.mtime);
-                
                 if (tab.document.meta.timestamp < stat.mtime) {
                     var doc = tab.document;
                     
