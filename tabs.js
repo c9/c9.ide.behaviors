@@ -7,7 +7,8 @@
 define(function(require, exports, module) {
     main.consumes = [
         "Plugin", "settings", "menus", "preferences", "commands", 
-        "tabManager", "ui", "save", "panels", "tree", "Menu"
+        "tabManager", "ui", "save", "panels", "tree", "Menu", "fs",
+        "dialog.filechange"
     ];
     main.provides = ["tabbehavior"];
     return main;
@@ -25,7 +26,9 @@ define(function(require, exports, module) {
         var save     = imports.save;
         var panels   = imports.panels;
         var ui       = imports.ui;
+        var fs       = imports.fs;
         var prefs    = imports.preferences;
+        var confirm  = imports["dialog.filechange"].show;
         
         /***** Initialization *****/
         
@@ -1033,6 +1036,40 @@ define(function(require, exports, module) {
             panes[1].vsplit(true);
         }
         
+        function checkReopenedTab(e){
+            var tab = e.tab;
+            if (!tab.path)
+                return;
+            
+            fs.stat(tab.path, function(err, stat){
+                if (err) return;
+                
+                // @todo this won't work well on windows, because
+                // there is a 20s period in which the mtime is
+                // the same. The solution would be to have a 
+                // way to compare the saved document to the 
+                // loaded document that created the state
+                console.warn(tab.document.meta.timestamp, stat.mtime, 
+                    tab.document.meta.timestamp - stat.mtime);
+                
+                if (tab.document.meta.timestamp < stat.mtime) {
+                    var doc = tab.document;
+                    
+                    confirm("File Changed", 
+                      tab.path + " has been changed on disk.",
+                    function(){
+                        // Set to changed
+                        doc.undoManager.bookmark(-2)
+                    }, 
+                    function(){
+                        tabs.reload(tab, function(){});
+                    }, 
+                    false, 
+                    { merge: false, applyall: false });
+                }
+            });
+        }
+        
         // Record the last 10 closed tabs or pane sets
         function addTabToClosedMenu(tab){
             if (menuClosedItems.ignore) return;
@@ -1041,7 +1078,7 @@ define(function(require, exports, module) {
                 return;
             
             // Record state
-            var state = tab.getState();
+            var state     = tab.getState();
             
             if (!tab.restore) {
                 for (var i = menuClosedItems.length - 1; i >= 0; i--) {
@@ -1060,10 +1097,14 @@ define(function(require, exports, module) {
                     state.active = true;
                     state.pane    = this.parentNode.pane;
                     
+                    tabs.on("open", checkReopenedTab);
+                    
                     // Open pane
                     tab.restore
                         ? tab.restore(state)
                         : tabs.open(state, function(){});
+                        
+                    tabs.off("open", checkReopenedTab);
                     
                     // Remove pane from menu
                     menuClosedItems.remove(item);
