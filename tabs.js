@@ -1052,17 +1052,18 @@ define(function(require, exports, module) {
                 if (tab.document.meta.timestamp < stat.mtime) {
                     var doc = tab.document;
                     
-                    confirm("File Changed", 
+                    confirm("File Changed",
                       tab.path + " has been changed on disk.",
-                    function(){
-                        // Set to changed
-                        doc.undoManager.bookmark(-2)
-                    }, 
-                    function(){
-                        tabs.reload(tab, function(){});
-                    }, 
-                    false, 
-                    { merge: false, applyall: false });
+                      "Would you like to reload this file?",
+                      function(){
+                          tabs.reload(tab, function(){});
+                      }, 
+                      function(){
+                          // Set to changed
+                          doc.undoManager.bookmark(-2);
+                      }, 
+                      { merge: false, all: false }
+                    );
                 }
             });
         }
