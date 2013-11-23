@@ -46,7 +46,7 @@ define(function(require, exports, module) {
                 }
             }, handle);
             
-            ui.insertCss("* { }", handle);
+            ui.insertCss("* { }", false, handle);
         }
         
         function canTabBeRemoved(pane, min){
