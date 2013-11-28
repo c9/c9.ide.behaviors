@@ -376,8 +376,17 @@ define(function(require, exports, module) {
             });
             
             tabs.on("tabReparent", function(e) {
-                // Hack to force focus on the right pane
+                // Move to new access list
+                var lastList   = e.lastPane.meta.accessList;
                 var accessList = e.tab.pane.meta.accessList;
+                lastList.splice(lastList.indexOf(e.tab), 1);
+                
+                if (e.tab == tabs.focussedTab)
+                    accessList.unshift(e.tab);
+                else
+                    accessList.push(e.tab);
+                
+                // Hack to force focus on the right pane
                 if (tabs.focussedTab == e.tab && accessList[1])
                     e.lastPane.aml.nextTabInLine = accessList[1].aml;
             });
