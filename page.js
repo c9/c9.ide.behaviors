@@ -161,7 +161,7 @@ define(function(require, exports, module) {
                 
                 // Set initial position
                 if (e || addOne)
-                    mouseMoveOrder(e, newTabWidth, lastPane == pane);
+                    mouseMoveOrder(e, newTabWidth); //, lastPane == pane);
                 
                 apf.addListener(document, "mousemove", mouseMoveOrder);
                 apf.addListener(document, "mouseup", mouseUpOrder);
