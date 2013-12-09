@@ -1204,7 +1204,7 @@ define(function(require, exports, module) {
             menuClosedItems.forEach(function(item){
                 item.destroy(true, true);
             });
-            menuClosedItems = [];
+            menuClosedItems.length = 0; // = [];
             
             loaded = false;
         });
