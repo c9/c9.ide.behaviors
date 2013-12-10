@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     main.consumes = [
         "Plugin", "settings", "menus", "preferences", "commands", 
         "tabManager", "ui", "save", "panels", "tree", "Menu", "fs",
-        "dialog.filechange"
+        "dialog.question"
     ];
     main.provides = ["tabbehavior"];
     return main;
@@ -28,7 +28,7 @@ define(function(require, exports, module) {
         var ui       = imports.ui;
         var fs       = imports.fs;
         var prefs    = imports.preferences;
-        var confirm  = imports["dialog.filechange"].show;
+        var question = imports["dialog.question"].show;
         
         /***** Initialization *****/
         
@@ -1061,7 +1061,7 @@ define(function(require, exports, module) {
                 if (tab.document.meta.timestamp < stat.mtime) {
                     var doc = tab.document;
                     
-                    confirm("File Changed",
+                    question("File Changed",
                       tab.path + " has been changed on disk.",
                       "Would you like to reload this file?",
                       function(){
