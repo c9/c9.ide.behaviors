@@ -97,6 +97,7 @@ define(function(require, exports, module) {
             ["closepane", "Command-Ctrl-W", "Ctrl-W", function(){
                 return mnuContext.$tab || tabs.getPanes().length > 1;
             },  "close all tabs in this pane"],
+            ["nosplit",    "", "", null, "no split"],
             ["hsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
             ["vsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
             ["twovsplit",  "", "", null, "create a two pane vertical layout"],
