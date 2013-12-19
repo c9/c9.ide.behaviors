@@ -935,7 +935,7 @@ define(function(require, exports, module) {
                 var oldpane = state.pane;
                 var newpane = oldpane.getTabs().length === 0
                     ? oldpane
-                    : oldpane[state.type](state.far, null, pane);
+                    : oldpane[state.type](state.far, null, pane.aml);
                 
                 state.forEach(function(s){
                     s.pane = newpane;
