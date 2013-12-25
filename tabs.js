@@ -43,9 +43,7 @@ define(function(require, exports, module) {
         var paneList     = [];
         var accessedPane = 0;
         
-        var cycleKey     = apf.isMac ? 18 : 17;
-
-        var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab;
+        var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab, dirtyNextPane;
 
         var ACTIVEPAGE      = function(){ return tabs.focussedTab; };
         var ACTIVEPATH      = function(){ return (tabs.focussedTab || 1).path; };
@@ -483,13 +481,13 @@ define(function(require, exports, module) {
             });
     
             apf.addEventListener("keydown", function(eInfo) {
-                if (eInfo.keyCode == cycleKey) {
+                if (eInfo.keyCode == 17 || eInfo.keyCode == 18) {
                     cycleKeyPressed = true;
                 }
             });
     
             apf.addEventListener("keyup", function(eInfo) {
-                if (eInfo.keyCode == cycleKey && cycleKeyPressed) {
+                if (eInfo.keyCode == 17 || eInfo.keyCode == 18) {
                     cycleKeyPressed = false;
     
                     if (dirtyNextTab) {
@@ -502,6 +500,20 @@ define(function(require, exports, module) {
                             accessList.unshift(tab);
     
                             accessList.changed = true;
+                            settings.save();
+                        }
+    
+                        dirtyNextTab = false;
+                    }
+                    if (dirtyNextPane) {
+                        accessedPane = 0;
+    
+                        var tab = tabs.focussedTab;
+                        if (paneList[accessedPane] != tab) {
+                            paneList.remove(tab);
+                            paneList.unshift(tab);
+    
+                            paneList.changed = true;
                             settings.save();
                         }
     
@@ -720,7 +732,7 @@ define(function(require, exports, module) {
                 
                 accessedPane = index;
                 tabs.focusTab(next.pane.activeTab, null, true);
-                dirtyNextTab = true;
+                dirtyNextPane = true;
                 break;
             }
         }
