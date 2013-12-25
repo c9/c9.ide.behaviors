@@ -44,8 +44,7 @@ define(function(require, exports, module) {
         var accessedPane = 0;
         
         var cycleKey     = apf.isMac ? 18 : 17;
-        var paneCycleKey = 192;
-        
+
         var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab;
 
         var ACTIVEPAGE      = function(){ return tabs.focussedTab; };
@@ -327,8 +326,8 @@ define(function(require, exports, module) {
                 caption  : "Recently Closed Tabs",
                 disabled : true
             }), 1000001, plugin);
-            menuClosedItems.hide = function(){ div.hide(); label.hide(); }
-            menuClosedItems.show = function(){ div.show(); label.show(); }
+            menuClosedItems.hide = function(){ div.hide(); label.hide(); };
+            menuClosedItems.show = function(){ div.show(); label.show(); };
             menuClosedItems.hide();
 
             // Other Hooks
@@ -503,24 +502,6 @@ define(function(require, exports, module) {
                             accessList.unshift(tab);
     
                             accessList.changed = true;
-                            settings.save();
-                        }
-    
-                        dirtyNextTab = false;
-                    }
-                }
-                if (eInfo.keyCode == paneCycleKey && cycleKeyPressed) {
-                    cycleKeyPressed = false;
-    
-                    if (dirtyNextTab) {
-                        accessedTab = 0;
-    
-                        var tab = tabs.focussedTab;
-                        if (paneList[accessedTab] != tab) {
-                            paneList.remove(tab);
-                            paneList.unshift(tab);
-    
-                            paneList.changed = true;
                             settings.save();
                         }
     
@@ -715,33 +696,33 @@ define(function(require, exports, module) {
         }
     
         function nextpane(){
+            $nextPane(1);
+        }
+        
+        function previouspane(){
+            $nextPane(-1);
+        }
+        
+        function $nextPane(dir) {
             if (tabs.getPanes().length === 1)
                 return;
-    
-            if (++accessedPane >= paneList.length)
-                accessedPane = 0;
-    
-            var next = paneList[accessedPane];
-            if (typeof next != "object" || !next.pane.visible)
-                return nextpane();
-            tabs.focusTab(next.pane.activeTab, null, true);
-    
-            dirtyNextTab = true;
-        }
-    
-        function previouspane(){
-            if (tabs.getTabs().length === 1)
-                return;
-    
-            if (--accessedPane < 0)
-                accessedPane = paneList.length - 1;
-    
-            var next = paneList[accessedPane];
-            if (typeof next != "object" || !next.pane.visible)
-                return previouspane();
-            tabs.focusTab(next.pane.activeTab, null, true);
-    
-            dirtyNextTab = true;
+            
+            var l = paneList.length;
+            for (var i = 1; i <= l; i++) {
+                var index = (accessedPane + dir * i) % l;
+                var next = paneList[index];
+                if (typeof next != "object" || !next.pane.visible)
+                    continue;
+                if (next.pane.activeTab == tabs.focussedTab) {
+                    console.error("error in panelist");
+                    continue;
+                }
+                
+                accessedPane = index;
+                tabs.focusTab(next.pane.activeTab, null, true);
+                dirtyNextTab = true;
+                break;
+            }
         }
     
         function gototabright(e) {
