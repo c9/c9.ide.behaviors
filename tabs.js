@@ -207,48 +207,48 @@ define(function(require, exports, module) {
                 }
             }), 1000400, plugin);
 
-            menus.addItemByPath("Goto/~", new ui.divider(), 300, plugin);
+            menus.addItemByPath("Window/~", new ui.divider(), 350, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/", null, 301, plugin);
+            menus.addItemByPath("Window/Navigation/", null, 400, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Tab to the Right", new ui.item({
+            menus.addItemByPath("Window/Navigation/Tab to the Right", new ui.item({
                 command : "gototabright"
             }), 100, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Tab to the Left", new ui.item({
+            menus.addItemByPath("Window/Navigation/Tab to the Left", new ui.item({
                 command : "gototableft"
             }), 200, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Next Tab in History", new ui.item({
+            menus.addItemByPath("Window/Navigation/Next Tab in History", new ui.item({
                 command : "nexttab"
             }), 300, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Previous Tab in History", new ui.item({
+            menus.addItemByPath("Window/Navigation/Previous Tab in History", new ui.item({
                 command : "previoustab"
             }), 400, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/~", new ui.divider(), 500, plugin);
+            menus.addItemByPath("Window/Navigation/~", new ui.divider(), 500, plugin);
             
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Right", new ui.item({
+            menus.addItemByPath("Window/Navigation/Move Tab to Right", new ui.item({
                 command : "movetabright"
             }), 600, plugin);
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Left", new ui.item({
+            menus.addItemByPath("Window/Navigation/Move Tab to Left", new ui.item({
                 command : "movetableft"
             }), 700, plugin);
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Up", new ui.item({
+            menus.addItemByPath("Window/Navigation/Move Tab to Up", new ui.item({
                 command : "movetabup"
             }), 800, plugin);
-            menus.addItemByPath("Goto/Tab or Pane/Move Tab to Down", new ui.item({
+            menus.addItemByPath("Window/Navigation/Move Tab to Down", new ui.item({
                 command : "movetabdown"
             }), 900, plugin);
             
-            menus.addItemByPath("Goto/Tab or Pane/~", new ui.divider(), 1000, plugin);
+            menus.addItemByPath("Window/Navigation/~", new ui.divider(), 1000, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Next Pane in History", new ui.item({
+            menus.addItemByPath("Window/Navigation/Next Pane in History", new ui.item({
                 command : "nextpane"
             }), 1100, plugin);
 
-            menus.addItemByPath("Goto/Tab or Pane/Previous Pane in History", new ui.item({
+            menus.addItemByPath("Window/Navigation/Previous Pane in History", new ui.item({
                 command : "previouspane"
             }), 1200, plugin);
             
