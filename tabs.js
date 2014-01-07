@@ -405,7 +405,7 @@ define(function(require, exports, module) {
                 if (tab.title) {
                     // @todo candidate for optimization using a hash
                     for (var i = menuClosedItems.length - 1; i >= 0; i--) {
-                        if (menuClosedItems[i].caption == tab.title) {
+                        if (menuClosedItems[i].path == tab.path) {
                             menuClosedItems.splice(i, 1)[0].destroy(true, true);
                             if (!menuClosedItems.length)
                                 menuClosedItems.hide();
@@ -1083,7 +1083,7 @@ define(function(require, exports, module) {
             
             if (!tab.restore) {
                 for (var i = menuClosedItems.length - 1; i >= 0; i--) {
-                    if (menuClosedItems[i].caption == tab.title) {
+                    if (menuClosedItems[i].path == tab.path) {
                         menuClosedItems.splice(i, 1)[0].destroy(true, true);
                     }
                 }
@@ -1092,6 +1092,7 @@ define(function(require, exports, module) {
             // Create menu item
             var item  = new ui.item({
                 caption : tab.title,
+                path    : tab.path,
                 style   : "padding-left:35px",
                 onclick : function(e){
                     // Update State
