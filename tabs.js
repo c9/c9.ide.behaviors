@@ -956,22 +956,28 @@ define(function(require, exports, module) {
             });
         }
         
-        function hsplit(tab){
+        function hsplit(tab, pane){
             if (!tab)
                 tab = tabs.focussedTab;
             
-            var newtab = tab.pane.hsplit(true);
-            if (tab.pane.getTabs().length > 1)
-                tab.attachTo(newtab);
+            if (tab)
+                pane = tab.pane;
+            
+            var newpane = pane.hsplit(true);
+            if (pane.getTabs().length > 1)
+                tab.attachTo(newpane);
         }
         
-        function vsplit(tab){
+        function vsplit(tab, pane){
             if (!tab)
                 tab = tabs.focussedTab;
             
-            var newtab = tab.pane.vsplit(true);
-            if (tab.pane.getTabs().length > 1)
-                tab.attachTo(newtab);
+            if (tab)
+                pane = tab.pane;
+            
+            var newpane = pane.vsplit(true);
+            if (pane.getTabs().length > 1)
+                tab.attachTo(newpane);
         }
         
         function nosplit(){
