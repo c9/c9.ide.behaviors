@@ -92,7 +92,7 @@ define(function(require, exports, module) {
                 }
             }, "close all tabs to the left of the focussed tab"],
             ["closepane", "Command-Ctrl-W", "Ctrl-W", function(){
-                return mnuContext.$tab || tabs.getPanes().length > 1;
+                return mnuContext.$tab || tabs.getTabs().length;
             },  "close all tabs in this pane"],
             ["nosplit",    "", "", null, "no split"],
             ["hsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
@@ -891,9 +891,12 @@ define(function(require, exports, module) {
         }
         
         function closepane(tab, pane){
+            if (!tab)
+                tab = tabs.focussedTab;
             if (!pane)
                 pane = tab.pane;
-                
+            if (!pane) return;
+            
             var pages = pane.getTabs();
             if (!pages.length) {
                 if (canTabBeRemoved(pane))
