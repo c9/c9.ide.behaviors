@@ -95,10 +95,10 @@ define(function(require, exports, module) {
                 return mnuContext.$tab || tabs.getTabs().length;
             },  "close all tabs in this pane"],
             ["nosplit",    "", "", null, "no split"],
-            ["hsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
-            ["vsplit",     "", "", null, "split the current pane horizontally and move the active tab to it"],
-            ["twovsplit",  "", "", null, "create a two pane vertical layout"],
-            ["twohsplit",  "", "", null, "create a two pane horizontal layout"],
+            ["hsplit",     "", "", null, "split the current pane in two columns and move the active tab to it"],
+            ["vsplit",     "", "", null, "split the current pane in two rows and move the active tab to it"],
+            ["twovsplit",  "", "", null, "create a two pane row layout"],
+            ["twohsplit",  "", "", null, "create a two pane column layout"],
             ["foursplit",  "", "", null, "create a four pane layout"],
             ["threeleft",  "", "", null, "create a three pane layout with the stack on the left side"],
             ["threeright", "", "", null, "create a three pane layout with the stack on the right side"]
@@ -183,10 +183,10 @@ define(function(require, exports, module) {
             }), 300, plugin);
             
             menus.addItemByPath("Window/Tabs/~", new ui.divider(), 1000000, plugin);
-            menus.addItemByPath("Window/Tabs/Split Pane Vertically", new ui.item({
+            menus.addItemByPath("Window/Tabs/Split Pane in Two Rows", new ui.item({
                 command : "vsplit"
             }), 1000100, plugin);
-            menus.addItemByPath("Window/Tabs/Split Pane Horizontally", new ui.item({
+            menus.addItemByPath("Window/Tabs/Split Pane in Two Columns", new ui.item({
                 command : "hsplit"
             }), 1000200, plugin);
             menus.addItemByPath("Window/Tabs/~", new ui.divider(), 1000300, plugin);
@@ -310,10 +310,10 @@ define(function(require, exports, module) {
                 command : "closealltotheleft"
             }), 700, mnuContext, plugin);
             menus.addItemByPath("~", new ui.divider(), 750, mnuContext, plugin);
-            menus.addItemByPath("Split Pane Vertically", new ui.item({
+            menus.addItemByPath("Split Pane in Two Rows", new ui.item({
                 command : "vsplit"
             }), 800, mnuContext, plugin);
-            menus.addItemByPath("Split Pane Horizontally", new ui.item({
+            menus.addItemByPath("Split Pane in Two Columns", new ui.item({
                 command : "hsplit"
             }), 900, mnuContext, plugin);
             
