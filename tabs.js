@@ -378,7 +378,7 @@ define(function(require, exports, module) {
                 var lastList   = e.lastPane.meta.accessList;
                 var accessList = e.tab.pane.meta.accessList;
                 lastList.splice(lastList.indexOf(e.tab), 1);
-                
+
                 if (e.tab == tabs.focussedTab)
                     accessList.unshift(e.tab);
                 else
@@ -393,7 +393,7 @@ define(function(require, exports, module) {
                 var tab = e.tab;
                 if (tab.document.meta.preview)
                     return;
-                    
+
                 addTabToClosedMenu(tab);
                 tab.pane.meta.accessList.remove(tab);
                 paneList.remove(tab);
@@ -443,6 +443,7 @@ define(function(require, exports, module) {
     
             tabs.on("focusSync", function(e){
                 var tab = e.tab;
+                if (!tab.loaded) return;
 
                 if (!cycleKeyPressed) {
                     var accessList = tab.pane.meta.accessList;
@@ -464,7 +465,7 @@ define(function(require, exports, module) {
             });
             tabs.on("tabAfterActivate", function(e){
                 var tab = e.tab;
-                if (tab == tabs.focussedTab) 
+                if (tab == tabs.focussedTab || !tab.loaded) 
                     return;
             
                 if (!cycleKeyPressed) {
@@ -498,7 +499,6 @@ define(function(require, exports, module) {
                         if (accessList[accessedTab] != tab) {
                             accessList.remove(tab);
                             accessList.unshift(tab);
-    
                             accessList.changed = true;
                             settings.save();
                         }
