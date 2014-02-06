@@ -178,7 +178,7 @@ define(function(require, exports, module) {
                     
                     if (change === true) {
                         var maxTabWidth = Math.min(maxWidth + diff, 
-                          ((rect.width - leftPadding - rightPadding + rightMargin) 
+                          ((rect.width - leftPadding - rightPadding + rightMargin + 3) 
                             / pane.getPages().length) - rightMargin);
                         tabWidth = maxTabWidth + leftMargin + rightMargin;
                         
