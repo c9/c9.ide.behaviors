@@ -796,14 +796,13 @@ define(function(require, exports, module) {
                 return;
             
             // Tabs within the current pane
-            var pages   = tab.pane.getTabs();
+            var pages = tab.pane.getTabs();
             
             // Get new index
             var idx = pages.indexOf(tab) + (bRight ? 2 : -1);
             
             // Before current pane
             if (idx < 0 || idx > pages.length) {
-                var dt = new Date();
                 tab.pane.moveTabToSplit(tab, dir);
             }
             // In current pane
