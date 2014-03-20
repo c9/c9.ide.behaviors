@@ -137,7 +137,7 @@ define(function(require, exports, module) {
             // Preferences
             prefs.add({
                 "General" : {
-                    "General" : {
+                    "Tree & Navigate" : {
                         "Reveal Active File in Project Tree" : {
                             type     : "checkbox",
                             position : 4000,
