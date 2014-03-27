@@ -601,7 +601,7 @@ define(function(require, exports, module) {
             changedTabs   = [];
             unchangedTabs = [];
             
-            if (!pages) {
+            if (!pages || !(pages instanceof Array)) {
                 var container = me && me.aml && me.aml.parentNode || tabs.container;
                 pages = tabs.getTabs(container);
             }
