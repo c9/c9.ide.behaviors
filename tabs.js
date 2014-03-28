@@ -75,8 +75,8 @@ define(function(require, exports, module) {
             ["revealtab",      "Command-Shift-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
             ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MORETABSINPANE,  "navigate to the next tab in the stack of accessed tabs"],
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
-            ["nextpane",       "Option-ESC",         "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
-            ["previouspane",   "Option-Shift-ESC",   "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
+            ["nextpane",       "Option-ESC",       "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
+            ["previouspane",   "Option-Shift-ESC", "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
             ["closealltotheright", "", "", function(){
                 var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
                 if (tab) {
@@ -172,6 +172,7 @@ define(function(require, exports, module) {
                 command : "closealltabs"
             }), 120000, plugin);
 
+            mnuTabs = menus.addItemByPath("Window/Tabs", null, 10100, plugin);
             menus.addItemByPath("Window/Tabs/Close All Tabs In Pane", new ui.item({
                 command : "closepane"
             }), 100, plugin);
@@ -254,7 +255,6 @@ define(function(require, exports, module) {
             
             // Tab Helper Menu
             menus.addItemByPath("Window/~", new ui.divider(), 10000, plugin);
-            mnuTabs = menus.addItemByPath("Window/Tabs", null, 10100, plugin);
             
             mnuTabs.addEventListener("prop.visible", function(e) {
                 if (e.value) {
