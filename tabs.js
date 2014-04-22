@@ -708,11 +708,11 @@ define(function(require, exports, module) {
         }
     
         function nextpane(){
-            $nextPane(1);
+            return $nextPane(1);
         }
         
         function previouspane(){
-            $nextPane(-1);
+            return $nextPane(-1);
         }
         
         function $nextPane(dir) {
@@ -733,7 +733,7 @@ define(function(require, exports, module) {
                 accessedPane = index;
                 tabs.focusTab(next.pane.activeTab, null, true);
                 dirtyNextPane = true;
-                break;
+                return next.pane;
             }
         }
     
