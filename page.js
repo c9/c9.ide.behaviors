@@ -615,7 +615,8 @@ define(function(require, exports, module) {
                 }
                 
                 // Remove pane if empty
-                if (originalTab && canTabBeRemoved(originalTab.cloud9pane))
+                if (originalTab && originalTab != tab.parentNode
+                  && canTabBeRemoved(originalTab.cloud9pane))
                     originalTab.cloud9pane.unload();
                 
                 finish();
