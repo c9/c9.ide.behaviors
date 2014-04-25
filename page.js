@@ -612,6 +612,14 @@ define(function(require, exports, module) {
                 else {
                     tab.parentNode.$buttons.insertBefore(button,
                         originalPosition);
+                    
+                    if (originalTab == tab.parentNode) {
+                        var idx = tab.parentNode.childNodes.indexOf(tab.nextSibling);
+                        if (idx == -1)
+                            tab.parentNode.childNodes.push(tab);
+                        else
+                            tab.parentNode.childNodes.splice(idx, 0, tab);
+                    }
                 }
                 
                 // Remove pane if empty
