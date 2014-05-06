@@ -4,10 +4,10 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin    = imports.Plugin;
-        var ui        = imports.ui;
-        var anims     = imports.anims;
-        var tabs      = imports.tabManager;
+        var Plugin = imports.Plugin;
+        var ui = imports.ui;
+        var anims = imports.anims;
+        var tabs = imports.tabManager;
         var aceHandle = imports.ace;
         
         var css = require("text!./style.css");
@@ -15,7 +15,7 @@ define(function(require, exports, module) {
         /***** Initialization *****/
         
         var handle = new Plugin("Ajax.org", main.consumes);
-        // var emit   = handle.getEmitter();
+        // var emit = handle.getEmitter();
         
         var divSplit, divButton;
         
@@ -27,7 +27,7 @@ define(function(require, exports, module) {
             // Insert CSS
             ui.insertCss(css, options.staticPrefix, handle);
 
-            tabs.on("tabCreate", function(e){
+            tabs.on("tabCreate", function(e) {
                 var tab = e.tab;
                 
                 addInteraction(tab);
@@ -38,7 +38,7 @@ define(function(require, exports, module) {
                 })
             }, handle);
             
-            tabs.on("tabAfterClose", function(e){
+            tabs.on("tabAfterClose", function(e) {
                 if (e.last && canTabBeRemoved(e.tab.pane, 1)) {
                     e.tab.pane.aml.skipAnimOnce = true;
                     e.tab.unload();
@@ -49,7 +49,7 @@ define(function(require, exports, module) {
             ui.insertCss("* { }", false, handle);
         }
         
-        function canTabBeRemoved(pane, min){
+        function canTabBeRemoved(pane, min) {
             if (!pane || pane.getTabs().length > (min || 0)) 
                 return false;
             
@@ -63,8 +63,8 @@ define(function(require, exports, module) {
             return false;
         }
         
-        function addInteraction(plugin){
-            var tab    = plugin.aml;
+        function addInteraction(plugin) {
+            var tab = plugin.aml;
             var button = tab.$button;
             if (!button) return;
 
@@ -73,7 +73,7 @@ define(function(require, exports, module) {
             var started, tabWidth, leftPadding, leftPos, start, initMouse;
             var pages, clean, originalPosition, splitDirection, splitTab;
             
-            function setOrderMode(toTab, e){
+            function setOrderMode(toTab, e) {
                 if (toTab.isOrderCleaned === false) {
                     return setTimeout(function(){
                         setOrderMode(toTab, e);
@@ -103,19 +103,19 @@ define(function(require, exports, module) {
                 }
                 
                 var container = pane.$buttons;
-                var nodes     = container.childNodes;
-                var rect      = container.getBoundingClientRect();
-                var btn       = (pane.getPage() || { $button: button }).$button;
-                var diff      = ui.getWidthDiff(btn);
+                var nodes = container.childNodes;
+                var rect = container.getBoundingClientRect();
+                var btn = (pane.getPage() || { $button: button }).$button;
+                var diff = ui.getWidthDiff(btn);
                 
-                var leftMargin  = parseInt(ui.getStyle(btn, "marginLeft"), 10) || 0;
+                var leftMargin = parseInt(ui.getStyle(btn, "marginLeft"), 10) || 0;
                 var rightMargin = parseInt(ui.getStyle(btn, "marginRight"), 10) || 0;
-                var maxWidth    = parseInt(ui.getStyle(btn, "maxWidth"), 10) || 150;
+                var maxWidth = parseInt(ui.getStyle(btn, "maxWidth"), 10) || 150;
                 if (maxWidth > 500) maxWidth = 150;
                 
-                leftPos      = rect.left;
-                pages        = pane.getPages();
-                leftPadding  = parseInt(ui.getStyle(container, "paddingLeft"), 10) || 0;
+                leftPos = rect.left;
+                pages = pane.getPages();
+                leftPadding = parseInt(ui.getStyle(container, "paddingLeft"), 10) || 0;
                 rightPadding = (parseInt(ui.getStyle(container, "paddingRight"), 10) || 0) + 24;
 
                 var addOne = pages.indexOf(tab) == -1;
@@ -143,10 +143,10 @@ define(function(require, exports, module) {
                 var iter;
                 while ((iter = info.pop())) {
                     btn = iter[0];
-                    btn.style.left     = (iter[1]) + "px";
-                    btn.style.top      = (iter[2]) + "px";
-                    btn.style.width    = (iter[3] - ui.getWidthDiff(btn)) + "px";
-                    btn.style.margin   = 0;
+                    btn.style.left = (iter[1]) + "px";
+                    btn.style.top = (iter[2]) + "px";
+                    btn.style.width = (iter[3] - ui.getWidthDiff(btn)) + "px";
+                    btn.style.margin = 0;
                     btn.style.position = "absolute";
                 }
                 
@@ -166,7 +166,7 @@ define(function(require, exports, module) {
                 apf.addListener(document, "mousemove", mouseMoveOrder);
                 apf.addListener(document, "mouseup", mouseUpOrder);
                 
-                clean = function(change, toTab){
+                clean = function(change, toTab) {
                     if (!toTab)
                         toTab = pane;
                     toTab.isOrderCleaned = false;
@@ -193,10 +193,10 @@ define(function(require, exports, module) {
                     
                     for (var i = nodes.length - 1; i >= 0; i--) {
                         if ((btn = nodes[i]).nodeType != 1) continue;
-                        btn.style.left     = 
-                        btn.style.top      = 
-                        btn.style.width    = 
-                        btn.style.margin   = 
+                        btn.style.left = 
+                        btn.style.top = 
+                        btn.style.width = 
+                        btn.style.margin = 
                         btn.style.position = "";
                     }
                     
@@ -204,7 +204,7 @@ define(function(require, exports, module) {
                 };
             }
             
-            function setSplitMode(e){
+            function setSplitMode(e) {
                 mode = "split";
                 
                 // Div that shows where to insert split
@@ -222,9 +222,9 @@ define(function(require, exports, module) {
                 start = function(){
                     // Fixate current position and width
                     var rect = button.getBoundingClientRect();
-                    button.style.left     = (rect.left) + "px";
-                    button.style.top      = (rect.top) + "px";
-                    button.style.width    = (dragWidth - ui.getWidthDiff(button)) + "px";
+                    button.style.left = (rect.left) + "px";
+                    button.style.top = (rect.top) + "px";
+                    button.style.width = (dragWidth - ui.getWidthDiff(button)) + "px";
                     button.style.position = "absolute";
                     
                     // Attach tab to body
@@ -253,10 +253,10 @@ define(function(require, exports, module) {
                 clean && clean(true);
                     
                 clean = function(){
-                    button.style.left     = 
-                    button.style.top      = 
-                    button.style.width    = 
-                    button.style.margin   = 
+                    button.style.left = 
+                    button.style.top = 
+                    button.style.width = 
+                    button.style.margin = 
                     button.style.position = "";
                     
                     divSplit.style.display = "none";
@@ -278,7 +278,7 @@ define(function(require, exports, module) {
                 if (!initMouse) {
                     clean(null, null, true);
                     
-                    button.style.zIndex        = 
+                    button.style.zIndex = 
                     button.style.pointerEvents = "";
                     
                     // Return all pointer events to iframes
@@ -290,7 +290,7 @@ define(function(require, exports, module) {
                 tab.$dragging = false;
             }
             
-            button.addEventListener("mousedown", function(e){
+            button.addEventListener("mousedown", function(e) {
                 // Tab needs to support ordering
                 if (!tab.parentNode.$order || tab.$dragging || e.button == 2)
                     return;
@@ -298,8 +298,8 @@ define(function(require, exports, module) {
                 // APF stuff
                 tab.$dragging = true;
                 
-                startX  = e.clientX; 
-                startY  = e.clientY; 
+                startX = e.clientX; 
+                startY = e.clientY; 
                 
                 initMouse = function(){
                     // Calculate where on the button was clicked
@@ -308,7 +308,7 @@ define(function(require, exports, module) {
                     offsetY = startY - rect.top;
                     
                     // Prepare button for dragging
-                    button.style.zIndex        = 100000;
+                    button.style.zIndex = 100000;
                     button.style.pointerEvents = "none";
                     
                     // Initialize with order mode
@@ -324,21 +324,21 @@ define(function(require, exports, module) {
                 pane = plugin.pane.aml;
                 
                 // Store original info
-                originalTab      = pane;
+                originalTab = pane;
                 originalPosition = button.nextSibling;
-                dragWidth        = button.offsetWidth;
+                dragWidth = button.offsetWidth;
                 
                 apf.addListener(document, "mousemove", mouseMoveOrder);
                 apf.addListener(document, "mouseup", mouseUpOrder);
             }, true);
             
-            function isNotSnapped(e, container){
+            function isNotSnapped(e, container) {
                 if (!container)
                     container = pane.$buttons;
                 var rect = container.getBoundingClientRect();
                 
-                var x    = e.clientX;
-                var y    = e.clientY;
+                var x = e.clientX;
+                var y = e.clientY;
                 var diff = 10;
                 
                 return (
@@ -349,7 +349,7 @@ define(function(require, exports, module) {
                 );
             }
             
-            function showOrderPosition(idx, toWidth, finalize, finish){
+            function showOrderPosition(idx, toWidth, finalize, finish) {
                 if (idx < 0) idx = 0;
                 
                 var orderTab = (pages[idx - 1] == tab
@@ -383,12 +383,12 @@ define(function(require, exports, module) {
                 
                 // Patch + button which is changed to "" again
                 // btnPlus.style.position = "absolute";
-                // btnPlus.style.top      = "6px";
+                // btnPlus.style.top = "6px";
                 
                 animateTabs(finish, finalize, toWidth);
             }
             
-            function animateTabs(finish, includeTab, toWidth){
+            function animateTabs(finish, includeTab, toWidth) {
                 // Get new pages array (with new order)
                 pages = pane.getPages();
                 pages.push({$button: btnPlus});
@@ -408,19 +408,19 @@ define(function(require, exports, module) {
                     }
 
                     var curLeft = p.$button.offsetLeft;
-                    var toLeft  = leftPadding + ((i - offset) * tabWidth) 
+                    var toLeft = leftPadding + ((i - offset) * tabWidth) 
                         + (!p.localName ? 11 : 0);
                         
                     if (toWidth || toLeft != curLeft) {
                         var tween = {
-                            node     : p.$button,
-                            duration : tab === p ? 0.20 : 0.15,
-                            timingFunction : tab === p
+                            node: p.$button,
+                            duration: tab === p ? 0.20 : 0.15,
+                            timingFunction: tab === p
                                 ? "cubic-bezier(.30, .08, 0, 1)"
                                 : "linear"
                         };
                         if (includeTab || tab !== p)
-                            tween.left  = toLeft + "px";
+                            tween.left = toLeft + "px";
                         if (toWidth && p.localName)
                             tween.width = toWidth + "px";
                         
@@ -433,7 +433,7 @@ define(function(require, exports, module) {
                 });
             }
             
-            function mouseMoveOrder(e, toWidth, finalize){
+            function mouseMoveOrder(e, toWidth, finalize) {
                 if (!e) e = event;
                 
                 if (!started) {
@@ -450,13 +450,13 @@ define(function(require, exports, module) {
                 
                 button.style.left = (e.clientX - leftPos - offsetX) + "px";
                 
-                var x   = button.offsetLeft - leftPadding + (tabWidth / 2);
+                var x = button.offsetLeft - leftPadding + (tabWidth / 2);
                 var idx = Math.floor(x / tabWidth);
                 
                 showOrderPosition(idx, toWidth, finalize);
             }
             
-            function mouseUpOrder(e){
+            function mouseUpOrder(e) {
                 apf.removeListener(document, "mousemove", mouseMoveOrder);
                 apf.removeListener(document, "mouseup", mouseUpOrder);
                 
@@ -465,7 +465,7 @@ define(function(require, exports, module) {
                 
                 button.style.left = (e.clientX - leftPos - offsetX) + "px";
                 
-                var x   = button.offsetLeft - leftPadding + (tabWidth / 2);
+                var x = button.offsetLeft - leftPadding + (tabWidth / 2);
                 var idx = Math.floor(x / tabWidth);
                 
                 // Show final order
@@ -479,7 +479,7 @@ define(function(require, exports, module) {
                     originalTab.cloud9pane.unload();
             }
             
-            function showSplitPosition(e){
+            function showSplitPosition(e) {
                 var el = document.elementFromPoint(e.clientX, e.clientY);
                 var aml = apf.findHost(el);
                 
@@ -489,7 +489,7 @@ define(function(require, exports, module) {
                 // If aml is not the pane we seek, lets abort
                 if (!aml) {
                     divSplit.style.display = "none";
-                    splitTab       = null;
+                    splitTab = null;
                     splitDirection = null;
                     return;
                 }
@@ -500,9 +500,9 @@ define(function(require, exports, module) {
                 
                 // Find the rotated quarter that we're in
                 var rect = aml.$ext.getBoundingClientRect();
-                var left   = (e.clientX - rect.left) / rect.width;
-                var right  = 1 - left;
-                var top    = (e.clientY - rect.top) / rect.height;
+                var left = (e.clientX - rect.left) / rect.width;
+                var right = 1 - left;
+                var top = (e.clientY - rect.top) / rect.height;
                 var bottom = 1 - top;
                 
                 // Check whether we're going to dock
@@ -514,7 +514,7 @@ define(function(require, exports, module) {
                 // Cannot split pane that would be removed later
                 if (aml.getPages().length === 0) { // && aml == originalTab
                     divSplit.style.display = "none";
-                    splitTab       = null;
+                    splitTab = null;
                     splitDirection = null;
                     return;
                 }
@@ -528,42 +528,42 @@ define(function(require, exports, module) {
                 
                 // Left
                 if (min == left) {
-                    divSplit.style.left   = rect.left + "px";
-                    divSplit.style.top    = (bHeight + rect.top) + "px";
-                    divSplit.style.width  = (rect.width / 2) + "px";
+                    divSplit.style.left = rect.left + "px";
+                    divSplit.style.top = (bHeight + rect.top) + "px";
+                    divSplit.style.width = (rect.width / 2) + "px";
                     divSplit.style.height = (rect.height - bHeight) + "px";
                     splitDirection = "w";
                 }
                 // Right
                 else if (min == right) {
-                    divSplit.style.left   = rect.left + (rect.width / 2) + "px";
-                    divSplit.style.top    = (bHeight + rect.top) + "px";
-                    divSplit.style.width  = (rect.width / 2) + "px";
+                    divSplit.style.left = rect.left + (rect.width / 2) + "px";
+                    divSplit.style.top = (bHeight + rect.top) + "px";
+                    divSplit.style.width = (rect.width / 2) + "px";
                     divSplit.style.height = (rect.height - bHeight) + "px";
                     splitDirection = "e";
                 }
                 // Top
                 else if (min == top) {
-                    divSplit.style.left   = rect.left + "px";
-                    divSplit.style.top    = (bHeight + rect.top) + "px";
-                    divSplit.style.width  = rect.width + "px";
+                    divSplit.style.left = rect.left + "px";
+                    divSplit.style.top = (bHeight + rect.top) + "px";
+                    divSplit.style.width = rect.width + "px";
                     divSplit.style.height = ((rect.height / 2) - bHeight) + "px";
                     splitDirection = "n";
                 }
                 // Bottom
                 else if (min == bottom) {
-                    divSplit.style.left   = rect.left + "px";
-                    divSplit.style.top    = (rect.top + (rect.height / 2)) + "px";
-                    divSplit.style.width  = rect.width + "px";
+                    divSplit.style.left = rect.left + "px";
+                    divSplit.style.top = (rect.top + (rect.height / 2)) + "px";
+                    divSplit.style.width = rect.width + "px";
                     divSplit.style.height = (rect.height / 2) + "px";
                     splitDirection = "s";
                 }
                 
-                divSplit.style.cursor  = splitDirection + "-resize";
+                divSplit.style.cursor = splitDirection + "-resize";
                 divSplit.style.display = "block";
             }
             
-            function mouseMoveSplit(e){
+            function mouseMoveSplit(e) {
                 if (!started) {
                     if (Math.abs(startX - e.clientX) < 4
                       && Math.abs(startY - e.clientY) < 4)
@@ -574,14 +574,14 @@ define(function(require, exports, module) {
                 }
                 
                 button.style.left = (e.clientX - offsetX) + "px";
-                button.style.top  = (e.clientY - offsetY) + "px";
+                button.style.top = (e.clientY - offsetY) + "px";
                 
                 return showSplitPosition(e);
             }
             
-            function mouseUpSplit(e){
+            function mouseUpSplit(e) {
                 button.style.left = (e.clientX - offsetX) + "px";
-                button.style.top  = (e.clientY - offsetY) + "px";
+                button.style.top = (e.clientY - offsetY) + "px";
                 
                 apf.removeListener(document, "mousemove", mouseMoveSplit);
                 apf.removeListener(document, "mouseup", mouseUpSplit);
