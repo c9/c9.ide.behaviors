@@ -576,13 +576,16 @@ define(function(require, exports, module) {
                 tab = mnuContext.$tab || tabs.focussedTab;
             
             var pane;
-            if (tabs.getTabs().every(function(tab) {
+            tabs.getTabs().every(function(tab) {
                 if (tab.document.meta.clone) {
                     pane = tab.pane;
                     return false;
                 }
                 return true;
-            })) pane = tab.pane.hsplit(true);
+            });
+            
+            if (!pane || pane == tab.pane)
+                pane = tab.pane.hsplit(true);
             
             tabs.clone(tab, pane, function(err, tab){
                 
