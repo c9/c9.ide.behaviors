@@ -577,7 +577,7 @@ define(function(require, exports, module) {
             
             var pane;
             tabs.getTabs().every(function(tab) {
-                if (tab.document.meta.clone) {
+                if (tab.document.meta.cloned) {
                     pane = tab.pane;
                     return false;
                 }
