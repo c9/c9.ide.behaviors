@@ -53,6 +53,7 @@ define(function(require, exports, module) {
         
         var movekey = "Command-Option-Shift";
         var definition = [
+            ["clonetab",       "",                 "",                ACTIVEPAGE, "create a new tab with a view on the same file"],
             ["closetab",       "Option-W",         "Alt-W",           ACTIVEPAGE, "close the tab that is currently active"],
             ["closealltabs",   "Option-Shift-W",   "Alt-Shift-W",     ACTIVEPAGE, "close all opened tabs"],
             ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MORETABS,  "close all opened tabs, except the tab that is currently active"],
@@ -316,6 +317,10 @@ define(function(require, exports, module) {
             menus.addItemByPath("Split Pane in Two Columns", new ui.item({
                 command: "hsplit"
             }), 900, mnuContext, plugin);
+            menus.addItemByPath("~", new ui.divider(), 1000, mnuContext, plugin);
+            menus.addItemByPath("Duplicate View", new ui.item({
+                command: "clonetab"
+            }), 1010, mnuContext, plugin);
             
             mnuEditors = tabs.getElement("mnuEditors");
             var div, label;
@@ -564,6 +569,27 @@ define(function(require, exports, module) {
                     list.push(tab.name);
             });
             return list;
+        }
+        
+        function clonetab(tab) {
+            if (!tab)
+                tab = mnuContext.$tab || tabs.focussedTab;
+            
+            var pane;
+            tabs.getTabs().every(function(tab) {
+                if (tab.document.meta.cloned) {
+                    pane = tab.pane;
+                    return false;
+                }
+                return true;
+            });
+            
+            if (!pane || pane == tab.pane)
+                pane = tab.pane.hsplit(true);
+            
+            tabs.clone(tab, pane, function(err, tab){
+                
+            });
         }
             
         function closetab(tab) {
@@ -1083,7 +1109,7 @@ define(function(require, exports, module) {
         function addTabToClosedMenu(tab) {
             if (menuClosedItems.ignore) return;
             
-            if (tab.document.meta.preview)
+            if (tab.document.meta.preview || tab.document.meta.cloned)
                 return;
             
             // Record state
@@ -1226,6 +1252,11 @@ define(function(require, exports, module) {
              * 
              */
             get contextMenu(){ return mnuContext; },
+            
+            /**
+             * 
+             */
+            clonetab: clonetab,
             
             /**
              * 
