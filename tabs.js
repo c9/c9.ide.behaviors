@@ -1109,7 +1109,7 @@ define(function(require, exports, module) {
         function addTabToClosedMenu(tab) {
             if (menuClosedItems.ignore) return;
             
-            if (tab.document.meta.preview)
+            if (tab.document.meta.preview || tab.document.meta.cloned)
                 return;
             
             // Record state
