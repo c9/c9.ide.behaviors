@@ -1195,7 +1195,7 @@ define(function(require, exports, module) {
                 tab = pages[i];
                 if (!tab.title) continue;
                 menus.addItemToMenu(mnuTabs, mnu = new ui.item({
-                    caption: tab.title,
+                    caption: tab.title.replace(/[/]/g, "\u2044"),
                     relPage: tab,
                     command: "tab" + (i == 9 ? 0 : i + 1),
                     onclick: onclick
