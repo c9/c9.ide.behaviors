@@ -1190,15 +1190,13 @@ define(function(require, exports, module) {
             menuItems.push(mnu);
             
             // Create new items
-            var onclick = function() { tabs.focusTab(tab, null, true); };
             for (var i = 0; i < length; i++) {
                 tab = pages[i];
                 if (!tab.title) continue;
                 menus.addItemToMenu(mnuTabs, mnu = new ui.item({
                     caption: tab.title.replace(/[/]/g, "\u2044"),
                     relPage: tab,
-                    command: "tab" + (i == 9 ? 0 : i + 1),
-                    onclick: onclick
+                    command: "tab" + (i == 9 ? 0 : i + 1)
                 }), start + i + 1, false);
                 menuItems.push(mnu);
             }
