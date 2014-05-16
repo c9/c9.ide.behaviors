@@ -174,6 +174,7 @@ define(function(require, exports, module) {
             }), 120000, plugin);
 
             mnuTabs = new ui.menu();
+            
             menus.addItemByPath("Window/Tabs", mnuTabs, 10100, plugin);
             menus.addItemByPath("Window/Tabs/Close All Tabs In Pane", new ui.item({
                 command: "closepane"
