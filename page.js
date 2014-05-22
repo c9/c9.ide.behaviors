@@ -495,7 +495,7 @@ define(function(require, exports, module) {
                 }
                 
                 var tab = (aml.getPage() || {}).cloud9tab;
-                var dark = !tab || tab.className.names.indexOf("dark") > -1;
+                var dark = !tab || tab.classList.names.indexOf("dark") > -1;
                 divSplit.className = "split-area" + (dark ? " dark" : "");
                 
                 // Find the rotated quarter that we're in
