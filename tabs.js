@@ -380,7 +380,7 @@ define(function(require, exports, module) {
                     e.tab.pane.aml.nextTabInLine = accessList[1].aml;
             });
             
-            tabs.on("tabReparent", function(e) {
+            tabs.on("tabBeforeReparent", function(e) {
                 // Move to new access list
                 var lastList = e.lastPane.meta.accessList;
                 var accessList = e.tab.pane.meta.accessList;
@@ -392,8 +392,8 @@ define(function(require, exports, module) {
                     accessList.push(e.tab);
                 
                 // Hack to force focus on the right pane
-                if (tabs.focussedTab == e.tab && accessList[1])
-                    e.lastPane.aml.nextTabInLine = accessList[1].aml;
+                if (tabs.focussedTab == e.tab && lastList[0])
+                    e.lastPane.aml.nextTabInLine = lastList[0].aml;
             });
             
             tabs.on("tabDestroy", function(e) {
