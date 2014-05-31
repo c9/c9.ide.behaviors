@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-    main.consumes = ["Plugin", "ui", "tabManager", "ace", "anims"];
+    main.consumes = ["Plugin", "ui", "tabManager", "ace", "anims", "util"];
     main.provides = ["tabinteraction"];
     return main;
 
@@ -7,6 +7,7 @@ define(function(require, exports, module) {
         var Plugin = imports.Plugin;
         var ui = imports.ui;
         var anims = imports.anims;
+        var util = imports.util;
         var tabs = imports.tabManager;
         var aceHandle = imports.ace;
         
@@ -578,6 +579,20 @@ define(function(require, exports, module) {
                 
                 return showSplitPosition(e);
             }
+            
+            // var waiting;
+            // function schedule(e){
+            //     if (waiting) {
+            //         waiting = e;
+            //         return;
+            //     }
+                
+            //     waiting = e;
+            //     setTimeout(function(){
+            //         showSplitPosition(waiting);
+            //         waiting = false;
+            //     }, 1000);
+            // }
             
             function mouseUpSplit(e) {
                 button.style.left = (e.clientX - offsetX) + "px";

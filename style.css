@@ -33,7 +33,7 @@
     position: absolute;
     background: rgba(0,0,0,0.05);
     border: 1px solid rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 200px rgba(0, 0, 0,0.2) inset;
+    /*box-shadow: 0 0 200px rgba(0, 0, 0,0.2) inset;*/
     display: none;
     z-index: 100000;
     pointer-events: none;
@@ -44,6 +44,6 @@
 .dark.split-area {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255, 0.3);
-    box-shadow: 0 0 200px rgba(255,255,255,0.15) inset, 0 0 200px rgba(0,0,0,0.15) inset;
+    box-shadow: 0 0 200px rgba(255,255,255,0.15) inset;
     outline: 1px solid black;
 }
