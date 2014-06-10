@@ -396,7 +396,7 @@ define(function(require, exports, module) {
                     e.lastPane.aml.nextTabInLine = lastList[0].aml;
             });
             
-            tabs.on("tabDestroy", function(e) {
+            tabs.on("tabAfterClose", function(e) {
                 var tab = e.tab;
                 if (tab.document.meta.preview)
                     return;
