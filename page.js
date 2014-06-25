@@ -313,7 +313,7 @@ define(function(require, exports, module) {
                     button.style.pointerEvents = "none";
                     
                     // Initialize with order mode
-                    setOrderMode(tab.parentNode);
+                    setOrderMode(tab.parentNode, e);
                     
                     initMouse = null;
                 }
