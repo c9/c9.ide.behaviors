@@ -293,7 +293,7 @@ define(function(require, exports, module) {
             
             button.addEventListener("mousedown", function(e) {
                 // Tab needs to support ordering
-                if (!tab.parentNode.$order || tab.$dragging || e.button == 2)
+                if (!tab.parentNode.$order || tab.$dragging || e.button)
                     return;
                 
                 // APF stuff
