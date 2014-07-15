@@ -78,6 +78,9 @@ define(function(require, exports, module) {
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
             ["nextpane",       "Option-ESC",       "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
             ["previouspane",   "Option-Shift-ESC", "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
+            ["reopenLastTab", "", "", function(){
+               return menuClosedItems.length;
+            }, "reopen last closed tab"],
             ["closealltotheright", "", "", function(){
                 var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
                 if (tab) {
@@ -1213,6 +1216,12 @@ define(function(require, exports, module) {
                 menuItems.push(mnu);
             }
         }
+        
+        function reopenLastTab() {
+            var item = menuClosedItems[menuClosedItems.length - 1];
+            if (item)
+                item.getAttribute("onclick").call(item);
+        }
     
         /***** Lifecycle *****/
         
@@ -1357,6 +1366,11 @@ define(function(require, exports, module) {
              * 
              */
             revealtab: revealtab,
+            
+            /**
+             * 
+             */
+            reopenLastTab: reopenLastTab,
             
             /**
              * 
