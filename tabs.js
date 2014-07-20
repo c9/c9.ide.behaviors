@@ -660,15 +660,20 @@ define(function(require, exports, module) {
                 if (result != save.CANCEL) {
                     changedTabs.forEach(function(tab) {
                         tab.unload();
-                    })
-                    closeUnchangedTabs(function() {
-                        if (callback)
-                            callback();
                     });
+                    closeUnchangedTabs(done);
                 }
-                else if (callback)
-                    callback()
+                else 
+                    done();
             });
+            function done() {
+                if (callback) callback();
+                // todo dialog calls this twice when selecting no with changed tab
+                setTimeout(function() {
+                    changedTabs = [];
+                    unchangedTabs = [];
+                });
+            }
         }
     
         function closeUnchangedTabs(callback) {
