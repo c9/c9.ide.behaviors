@@ -289,7 +289,7 @@ define(function(require, exports, module) {
                     setTimeout(function(){
                         mnuContext.$tab = null;
                         mnuContext.pane = null;
-                    })
+                    });
                 }
             }
 
@@ -957,22 +957,8 @@ define(function(require, exports, module) {
             state.far = nodes.indexOf(pane.aml) == 1;
             state.sibling = nodes[state.far ? 0 : 1];
             state.getState = function(){ return state };
-            state.restore = function(state) { 
-                // pane was not being used. Why?
-                // var pane = state.sibling;
-                // if (pane && pane.cloud9pane) 
-                //     pane = pane.cloud9pane.aml;
-                    
-                var oldpane = state.pane;
-                var newpane = oldpane.getTabs().length === 0
-                    ? oldpane
-                    : oldpane[state.type](state.far, null, pane.aml);
-                
-                state.forEach(function(s) {
-                    s.pane = newpane;
-                    tabs.open(s, function(){});
-                });
-            };
+            state.restore = $restoreTabGroup;
+            state.paneName = pane.name;
             state.document = { meta: {} };
             
             // Close pages
@@ -991,6 +977,23 @@ define(function(require, exports, module) {
                 
                 // @todo there should probably be some check here
                 addTabToClosedMenu(state);
+            });
+        }
+        
+        function $restoreTabGroup(state) { 
+            // pane was not being used. Why?
+            // var pane = state.sibling;
+            // if (pane && pane.cloud9pane) 
+            //     pane = pane.cloud9pane.aml;
+            var pane = tabs.findPane(state.paneName) || {};
+            var oldpane = state.pane;
+            var newpane = oldpane.getTabs().length === 0
+                ? oldpane
+                : oldpane[state.type](state.far, null, pane.aml);
+            
+            state.forEach(function(s) {
+                s.pane = newpane;
+                tabs.open(s, function(){});
             });
         }
         
@@ -1124,8 +1127,9 @@ define(function(require, exports, module) {
             
             // Record state
             var state = tab.getState();
+            var restore = tab.restore;
             
-            if (!tab.restore) {
+            if (!restore) {
                 for (var i = menuClosedItems.length - 1; i >= 0; i--) {
                     if (menuClosedItems[i].path == tab.path) {
                         menuClosedItems.splice(i, 1)[0].destroy(true, true);
@@ -1146,8 +1150,8 @@ define(function(require, exports, module) {
                     tabs.on("open", checkReopenedTab);
                     
                     // Open pane
-                    tab.restore
-                        ? tab.restore(state)
+                    restore
+                        ? restore(state)
                         : tabs.open(state, function(){});
                         
                     tabs.off("open", checkReopenedTab);
@@ -1173,6 +1177,7 @@ define(function(require, exports, module) {
             // Remove excess menu item
             if (menuClosedItems.length > 10)
                 menuClosedItems.shift().destroy(true, true);
+            tab = null;
         }
     
         function updateTabMenu(force) {
@@ -1220,6 +1225,7 @@ define(function(require, exports, module) {
                 }), start + length + 1, false);
                 menuItems.push(mnu);
             }
+            tab = pages = null;
         }
         
         function reopenLastTab() {
