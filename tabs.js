@@ -96,7 +96,7 @@ define(function(require, exports, module) {
                 }
             }, "close all tabs to the left of the focussed tab"],
             ["closepane", "Command-Ctrl-W", "Ctrl-W", function(){
-                return mnuContext.$tab || tabs.getTabs().length;
+                return mnuContext.$tab || mnuContext.$pane || tabs.getTabs().length;
             },  "close all tabs in this pane"],
             ["nosplit",    "", "", null, "no split"],
             ["hsplit",     "", "", null, "split the current pane in two columns and move the active tab to it"],
@@ -288,7 +288,7 @@ define(function(require, exports, module) {
                     // use setTimeout because apf closes menu before menuitem onclick event
                     setTimeout(function(){
                         mnuContext.$tab = null;
-                        mnuContext.pane = null;
+                        mnuContext.$pane = null;
                     });
                 }
             }
@@ -345,6 +345,8 @@ define(function(require, exports, module) {
                     if (e.currentTarget) {
                         mnuContext.$tab = e.currentTarget.tagName == "page"
                             ? e.currentTarget.cloud9tab : null;
+                        mnuContext.$pane = (mnuContext.$tab || 0).pane 
+                            || e.currentTarget.cloud9pane;
                     }
                     if (ui.isChildOf(pane.$buttons, e.htmlEvent.target, true)) {
                         mnuContext.display(e.x, e.y);
