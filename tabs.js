@@ -921,7 +921,7 @@ define(function(require, exports, module) {
             for (var i = 0; i < containers.length; i++) {
                 if (ui.isChildOf(containers[i], pane.aml)) {
                     return containers[i]
-                        .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1
+                        .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1;
                 }
             }
             return false;
