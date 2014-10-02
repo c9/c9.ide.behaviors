@@ -39,11 +39,13 @@ define(function(require, exports, module) {
                 })
             }, handle);
             
-            tabs.on("tabAfterClose", function(e) {
+            tabs.on("tabDestroy", function(e) {
                 if (e.last && canTabBeRemoved(e.tab.pane, 1)) {
-                    e.tab.pane.aml.skipAnimOnce = true;
-                    e.tab.unload();
-                    e.tab.pane.unload();
+                    // e.tab.pane.aml.skipAnimOnce = true;
+                    // e.tab.unload();
+                    setTimeout(function() {
+                        e.tab.pane.unload();
+                    }, 0);
                 }
             }, handle);
             
