@@ -46,7 +46,7 @@ define(function(require, exports, module) {
         var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab, dirtyNextPane;
 
         var ACTIVEPAGE = function(){ return tabs.focussedTab; };
-        var ACTIVEPATH = function(){ return (tabs.focussedTab || 1).path; };
+        var ACTIVEPATH = function(){ var tab = tabs.focussedTab; return tab && (tab.path || tab.relatedPath); };
         var MORETABS = function(){ return tabs.getTabs().length > 1 };
         var MORETABSINPANE = function(){ return tabs.focussedTab && tabs.focussedTab.pane.getTabs().length > 1 };
         var MOREPANES = function(){ return tabs.getPanes().length > 1 };
@@ -901,12 +901,12 @@ define(function(require, exports, module) {
             revealInTree(tab, noFocus);
         }
     
-        function revealInTree (tab, noFocus) {
+        function revealInTree(tab, noFocus) {
             panels.activate("tree");
-    
-            tree.expand(tab.path, function(err) {
-                var path = err ? "/" : tab.path;
-                tree.select(path);
+            var path = tab.path || tab.relatedPath;
+            tree.expand(path, function(err) {
+                if (!err)
+                    tree.select(path);
                 tree.scrollToSelection();
             });
             if (!noFocus)
