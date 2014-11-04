@@ -7,7 +7,7 @@
     width : 23px;
     height : 18px;
     display : inline-block;
-    margin : 0 5px 0 0;
+    margin : 0 10px 0 0;
     cursor : pointer;
 }
 .splits span.nosplit            { background-position:     0          0; }
