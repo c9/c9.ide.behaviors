@@ -521,7 +521,7 @@ define(function(require, exports, module) {
                         accessedPane = 0;
     
                         var tab = tabs.focussedTab;
-                        if (paneList[accessedPane] != tab) {
+                        if (paneList[accessedPane] != tab && tab) {
                             paneList.remove(tab);
                             paneList.unshift(tab);
     
@@ -551,7 +551,7 @@ define(function(require, exports, module) {
         function addToPaneList(tab, first) {
             var pane = tab.pane, found;
             paneList.every(function(tab) {
-                if (tab.pane && tab.pane == pane) {
+                if (tab && tab.pane && tab.pane == pane) {
                     found = tab;
                     return false;
                 }
