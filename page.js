@@ -18,7 +18,7 @@ define(function(require, exports, module) {
         var handle = new Plugin("Ajax.org", main.consumes);
         // var emit = handle.getEmitter();
         
-        var divSplit, divButton;
+        var divSplit, divButton, plusMargin = 11;
         
         var loaded = false;
         function load(){
@@ -412,7 +412,7 @@ define(function(require, exports, module) {
 
                     var curLeft = p.$button.offsetLeft;
                     var toLeft = leftPadding + ((i - offset) * tabWidth) 
-                        + (!p.localName ? 11 : 0);
+                        + (!p.localName ? plusMargin : 0);
                         
                     if (toWidth || toLeft != curLeft) {
                         var tween = {
@@ -669,7 +669,10 @@ define(function(require, exports, module) {
         
         /**
          **/
-        handle.freezePublicAPI({});
+        handle.freezePublicAPI({
+            get plusMargin(){ return plusMargin; },
+            set plusMargin(v){ plusMargin = v; }
+        });
         
         register(null, {
             tabinteraction: handle
