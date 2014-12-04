@@ -3,7 +3,8 @@
     background: transparent;
 }
 .splits span{
-    background: url("@{image-path}/splits.png") no-repeat 0 0;
+    .image-2x(@pane-menu-splits-image, @pane-menu-splits-image-width, @pane-menu-splits-image-height);
+    background-position: 0 0;
     width : 23px;
     height : 18px;
     display : inline-block;
