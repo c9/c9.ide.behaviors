@@ -416,8 +416,9 @@ define(function(require, exports, module) {
 
                 if (tab.title) {
                     // @todo candidate for optimization using a hash
+                    var path = tab.path || tab.editorType;
                     for (var i = menuClosedItems.length - 1; i >= 0; i--) {
-                        if (menuClosedItems[i].path == tab.path) {
+                        if (menuClosedItems[i].path == path) {
                             menuClosedItems.splice(i, 1)[0].destroy(true, true);
                             if (!menuClosedItems.length)
                                 menuClosedItems.hide();
@@ -1123,7 +1124,6 @@ define(function(require, exports, module) {
         // Record the last 10 closed tabs or pane sets
         function addTabToClosedMenu(tab) {
             if (menuClosedItems.ignore) return;
-            
             if (tab.document.meta.preview || tab.document.meta.cloned)
                 return;
             
@@ -1131,9 +1131,10 @@ define(function(require, exports, module) {
             var state = tab.getState();
             var restore = tab.restore;
             
+            var path = tab.path || tab.editorType;
             if (!restore) {
                 for (var i = menuClosedItems.length - 1; i >= 0; i--) {
-                    if (menuClosedItems[i].path == tab.path) {
+                    if (menuClosedItems[i].path == path) {
                         menuClosedItems.splice(i, 1)[0].destroy(true, true);
                     }
                 }
@@ -1142,7 +1143,7 @@ define(function(require, exports, module) {
             // Create menu item
             var item = new ui.item({
                 caption: tab.title,
-                path: tab.path,
+                path: path,
                 style: "padding-left:35px",
                 onclick: function(e) {
                     // Update State
@@ -1167,6 +1168,9 @@ define(function(require, exports, module) {
                         menuClosedItems.hide();
                 }
             });
+            
+            // TODO: passing path to item doesn't work since apf adds it only when menu is shown
+            item.path = path;
             
             // Add item to menu
             menuClosedItems.push(item);
