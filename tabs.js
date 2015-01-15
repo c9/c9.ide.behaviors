@@ -326,6 +326,36 @@ define(function(require, exports, module) {
             menus.addItemByPath("Duplicate View", new ui.item({
                 command: "clonetab"
             }), 1010, mnuContext, plugin);
+
+            menus.addItemByPath("View/~", new ui.divider(), 800, plugin);
+            
+            menus.addItemByPath("View/Layout/", null, 900, plugin);
+
+            menus.addItemByPath("View/Layout/Single", new ui.item({
+                command: "nosplit"
+            }), 100, mnuContext, plugin);
+
+            menus.addItemByPath("View/Layout/Vertical Split", new ui.item({
+                command: "twovsplit"
+            }), 100, mnuContext, plugin);
+
+            menus.addItemByPath("View/Layout/Horizontal Split", new ui.item({
+                command: "twohsplit"
+            }), 200, mnuContext, plugin);
+
+            menus.addItemByPath("View/Layout/Cross Split", new ui.item({
+                command: "foursplit"
+            }), 300, mnuContext, plugin);
+
+            menus.addItemByPath("View/Layout/Split 1:2", new ui.item({
+                command: "threeright"
+            }), 400, mnuContext, plugin);            
+
+            menus.addItemByPath("View/Layout/Split 2:1", new ui.item({
+                command: "threeleft"
+            }), 500, mnuContext, plugin);
+
+
             
             mnuEditors = tabs.getElement("mnuEditors");
             var div, label;
