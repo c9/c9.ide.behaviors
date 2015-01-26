@@ -167,6 +167,23 @@ define(function(require, exports, module) {
                 }, plugin);
             });
             
+            commands.addCommand({
+                name: "refocusTab",
+                bindKey: { mac: "Esc", win: "Esc",  position: -1000 },
+                group: "Tabs",
+                isAvailable: function() {
+                    var el = apf.activeElement;
+                    if (el && (el.tagName == "page" || el.tagName == "menu"))
+                        return false;
+                    return !!tabs.focussedTab;
+                },
+                exec: function(e) {
+                    if (tabs.focussedTab)
+                        tabs.focusTab(tabs.focussedTab);
+                },
+                passEvent: true
+            }, plugin);
+            
             // General Menus
             menus.addItemByPath("File/~", new ui.divider(), 100000, plugin);
             menus.addItemByPath("File/Close File", new ui.item({
