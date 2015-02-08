@@ -9,16 +9,14 @@
         "url": "http://github.com/c9/c9.ide.behaviors.git"
     },
     "plugins": {
-        "plugin": {
-            "dashboard": {},
-            "page": {},
-            "tabs": {}
-        }
+        "dashboard": {},
+        "page": {},
+        "tabs": {}
     },
     "categories": [
         "core"
     ],
     "licenses": [
-        ""
+        "MIT"
     ]
 }
