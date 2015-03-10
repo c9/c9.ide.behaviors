@@ -77,7 +77,7 @@ define(function(require, exports, module) {
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
             ["nextpane",       "Option-ESC",       "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
             ["previouspane",   "Option-Shift-ESC", "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
-            ["reopenLastTab", "", "", function(){
+            ["reopenLastTab",  "Option-Shift-T",   "Alt-Shift-T", function(){
                return menuClosedItems.length;
             }, "reopen last closed tab"],
             ["closealltotheright", "", "", function(){
