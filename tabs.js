@@ -895,6 +895,7 @@ define(function(require, exports, module) {
                 tab.attachTo(tab.pane, pages[idx], null, true);
             }
 
+            tabs.focusTab(tab);
             return false;
         }
         
@@ -904,6 +905,7 @@ define(function(require, exports, module) {
                 return;
             
             tab.pane.moveTabToSplit(tab, dir);
+            tabs.focusTab(tab);
             return false;
         }
     
