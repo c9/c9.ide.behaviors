@@ -922,10 +922,17 @@ define(function(require, exports, module) {
     
         function showTab(idx) {
             // our indexes are 0 based an the number coming in is 1 based
-            var tab = (menuItems[idx] || false).relPage;
+            var pages = [];
+            tabs.getPanes().forEach(function(pane) {
+                pages = pages.concat(pane.getTabs());
+            });
+            pages = pages.filter(function(tab) {
+                return tab.title;
+            });
+            var tab = pages[idx - 1];
             if (!tab)
                 return false;
-    
+            
             tabs.focusTab(tab, null, true);
             return false;
         }
