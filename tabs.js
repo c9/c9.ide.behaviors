@@ -230,9 +230,9 @@ define(function(require, exports, module) {
                 }
             }), 1000400, plugin);
 
-            menus.addItemByPath("Window/~", new ui.divider(), 350, plugin);
+            menus.addItemByPath("Window/~", new ui.divider(), 9000, plugin);
 
-            menus.addItemByPath("Window/Navigation/", null, 400, plugin);
+            menus.addItemByPath("Window/Navigation/", null, 9100, plugin);
 
             menus.addItemByPath("Window/Navigation/Tab to the Right", new ui.item({
                 command: "gototabright"
