@@ -161,7 +161,7 @@ define(function(require, exports, module) {
                     exec: function (editor, arg) {
                         if (arg && !arg[0] && arg.source == "click")
                             arg = [mnuContext.$tab, mnuContext.$pane];
-                        plugin[item[0]].apply(plugin, arg);
+                        plugin[item[0]].call(plugin, arg);
                     }
                 }, plugin);
             });
@@ -774,7 +774,7 @@ define(function(require, exports, module) {
             dirtyNextTab = true;
         }
     
-        function previoustab (){
+        function previoustab(){
             if (tabs.getTabs().length === 1)
                 return;
                 
@@ -822,20 +822,26 @@ define(function(require, exports, module) {
             }
         }
     
-        function gototabright(e) {
-            return cycleTab("right");
+        function gototabright(opts) {
+            return cycleTab("right", opts);
         }
     
-        function gototableft() {
-            return cycleTab("left");
+        function gototableft(opts) {
+            return cycleTab("left", opts);
         }
     
-        function cycleTab(dir) {
+        function cycleTab(dir, opts) {
             var curr = tabs.focussedTab;
             var pages = curr && curr.pane.getTabs();
             if (!pages || pages.length == 1)
                 return;
-    
+            
+            if (opts && opts.editorType) {
+                pages = pages.filter(function(p) {
+                    return p.editorType == opts.editorType;
+                });
+            }
+            
             var currIdx = pages.indexOf(curr);
             var start = currIdx;
             var tab;
@@ -1517,7 +1523,12 @@ define(function(require, exports, module) {
             /**
              * 
              */
-            previouspane: previouspane
+            previouspane: previouspane,
+            
+            /**
+             * @ignore
+             */
+            cycleTab: cycleTab
         });
         
         register(null, {
