@@ -158,10 +158,10 @@ define(function(require, exports, module) {
                     group: "Tabs",
                     hint: item[4],
                     isAvailable: item[3],
-                    exec: function (editor, arg) {
+                    exec: function(editor, arg) {
                         if (arg && !arg[0] && arg.source == "click")
                             arg = [mnuContext.$tab, mnuContext.$pane];
-                        plugin[item[0]].call(plugin, arg);
+                        plugin[item[0]].apply(plugin, arg);
                     }
                 }, plugin);
             });
