@@ -12,8 +12,6 @@ define(function(require, exports, module) {
     main.provides = ["tabbehavior"];
     return main;
     
-    //@todo collect closed pages in mnuEditors
-
     function main(options, imports, register) {
         var Plugin = imports.Plugin;
         var settings = imports.settings;
@@ -55,13 +53,13 @@ define(function(require, exports, module) {
             ["clonetab",       "",                 "",                ACTIVEPAGE, "create a new tab with a view on the same file"],
             ["closetab",       "Option-W",         "Alt-W",           ACTIVEPAGE, "close the tab that is currently active"],
             ["closealltabs",   "Option-Shift-W",   "Alt-Shift-W",     ACTIVEPAGE, "close all opened tabs"],
-            ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MORETABS,  "close all opened tabs, except the tab that is currently active"],
+            ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MORETABS,   "close all opened tabs, except the tab that is currently active"],
             ["gototabright",   "Command-]",        "Ctrl-]",          MORETABSINPANE,  "navigate to the next tab, right to the tab that is currently active"],
             ["gototableft",    "Command-[",        "Ctrl-[",          MORETABSINPANE,  "navigate to the next tab, left to the tab that is currently active"],
-            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MORETABS,  "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
-            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MORETABS,  "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
-            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MORETABS,  "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
-            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MORETABS,  "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
+            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MORETABS,   "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
+            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MORETABS,   "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
+            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MORETABS,   "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
+            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MORETABS,   "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
             ["tab1",           "Command-1",        "Ctrl-1",          null,       "navigate to the first tab"],
             ["tab2",           "Command-2",        "Ctrl-2",          null,       "navigate to the second tab"],
             ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
@@ -324,12 +322,11 @@ define(function(require, exports, module) {
             menus.addItemByPath("Close Other Tabs", new ui.item({
                 command: "closeallbutme"
             }), 500, mnuContext, plugin);
-            menus.addItemByPath("~", new ui.divider(), 550, mnuContext, plugin);
-            menus.addItemByPath("Close Tabs to the Right", new ui.item({
-                command: "closealltotheright"
-            }), 600, mnuContext, plugin);
             menus.addItemByPath("Close Tabs to the Left", new ui.item({
                 command: "closealltotheleft"
+            }), 600, mnuContext, plugin);
+            menus.addItemByPath("Close Tabs to the Right", new ui.item({
+                command: "closealltotheright"
             }), 700, mnuContext, plugin);
             menus.addItemByPath("~", new ui.divider(), 750, mnuContext, plugin);
             menus.addItemByPath("Split Pane in Two Rows", new ui.item({
@@ -1321,6 +1318,18 @@ define(function(require, exports, module) {
                 item.destroy(true, true);
             });
             menuClosedItems.length = 0; // = [];
+            
+            mnuContext = null;
+            mnuEditors = null;
+            mnuTabs = null;
+            accessedTab = null;
+            paneList = null;
+            accessedPane = null;
+            cycleKeyPressed = null;
+            changedTabs = null;
+            unchangedTabs = null;
+            dirtyNextTab = null;
+            dirtyNextPane = null;
             
             loaded = false;
         });
