@@ -47,11 +47,14 @@ define(function(require, exports, module) {
             }, handle);
             
             tabs.on("tabDestroy", function(e) {
+                if (e.tab.meta.$isLastTabOfPane)
+                    setTimeout(function() { e.tab.pane.unload(); }, 0);
+            }, handle);
+            
+            tabs.on("tabAfterClose", function(e) {
                 if (e.last && canTabBeRemoved(e.tab.pane, 1)
                   && settings.getBool("user/tabs/@autoclosepanes")) {
-                    setTimeout(function() {
-                        e.tab.pane.unload();
-                    }, 0);
+                    e.tab.meta.$skipAnimation = true;
                 }
             }, handle);
             
