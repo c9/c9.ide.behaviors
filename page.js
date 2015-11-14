@@ -211,7 +211,7 @@ define(function(require, exports, module) {
                         return animateTabs(cb, null, maxTabWidth - diff);
                     }
                     
-                    if (curbtn && curpage == curpage.parentNode.getPage()) {
+                    if (curbtn && curpage.parentNode && curpage == curpage.parentNode.getPage()) {
                         ui.setStyleClass(curbtn, "curbtn");
                         curbtn = null;
                     }
