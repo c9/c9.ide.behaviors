@@ -62,7 +62,7 @@ define(function(require, exports, module) {
                "General" : {
                     "User Interface" : {
                         position: 20,
-                        "Automatically Close Panes With Zero Tabs" : {
+                        "Automatically Close Empty Panes" : {
                             type: "checkbox",
                             path: "user/tabs/@autoclosepanes",
                             position: 1150
@@ -500,8 +500,9 @@ define(function(require, exports, module) {
                 plugin.activate();
                 
                 // Remove pane if empty
-                // if (originalTab && canTabBeRemoved(originalTab.cloud9pane))
-                //     originalTab.cloud9pane.unload();
+                if (originalTab && canTabBeRemoved(originalTab.cloud9pane) 
+                  && settings.getBool("user/tabs/@autoclosepanes"))
+                    originalTab.cloud9pane.unload();
             }
             
             function showSplitPosition(e) {
