@@ -47,7 +47,7 @@ define(function(require, exports, module) {
             }, handle);
             
             tabs.on("tabDestroy", function(e) {
-                if (e.tab.meta.$isLastTabOfPane)
+                if (e.tab.meta.$skipAnimation)
                     setTimeout(function() { e.tab.pane.unload(); }, 0);
             }, handle);
             
