@@ -1,5 +1,7 @@
 define(function(require, exports, module) {
-    main.consumes = ["Plugin", "ui", "tabManager", "ace", "anims", "util"];
+    main.consumes = [
+        "Plugin", "ui", "tabManager", "ace", "anims", "settings", "preferences"
+    ];
     main.provides = ["tabinteraction"];
     return main;
 
@@ -7,7 +9,8 @@ define(function(require, exports, module) {
         var Plugin = imports.Plugin;
         var ui = imports.ui;
         var anims = imports.anims;
-        var util = imports.util;
+        var settings = imports.settings;
+        var prefs = imports.preferences;
         var tabs = imports.tabManager;
         var aceHandle = imports.ace;
         
@@ -27,6 +30,10 @@ define(function(require, exports, module) {
             
             // Insert CSS
             ui.insertCss(css, options.staticPrefix, handle);
+            
+            settings.on("read", function(){
+                settings.setDefaults("user/tabs", [["autoclosepanes", true]]);
+            }, handle);
 
             tabs.on("tabCreate", function(e) {
                 var tab = e.tab;
@@ -36,16 +43,28 @@ define(function(require, exports, module) {
                 // Make sure that events are put on the button when the skin changes
                 tab.aml.on("$skinchange", function(){
                     addInteraction(tab);
-                })
+                });
             }, handle);
             
             tabs.on("tabDestroy", function(e) {
-                if (e.last && canTabBeRemoved(e.tab.pane, 1)) {
-                    // e.tab.pane.aml.skipAnimOnce = true;
-                    // e.tab.unload();
+                if (e.last && canTabBeRemoved(e.tab.pane, 1)
+                  && settings.getBool("user/tabs/@autoclosepanes")) {
                     setTimeout(function() {
                         e.tab.pane.unload();
                     }, 0);
+                }
+            }, handle);
+            
+            prefs.add({
+               "General" : {
+                    "User Interface" : {
+                        position: 20,
+                        "Automatically Close Panes With Zero Tabs" : {
+                            type: "checkbox",
+                            path: "user/tabs/@autoclosepanes",
+                            position: 1150
+                        }
+                    }
                 }
             }, handle);
             
@@ -478,8 +497,8 @@ define(function(require, exports, module) {
                 plugin.activate();
                 
                 // Remove pane if empty
-                if (originalTab && canTabBeRemoved(originalTab.cloud9pane))
-                    originalTab.cloud9pane.unload();
+                // if (originalTab && canTabBeRemoved(originalTab.cloud9pane))
+                //     originalTab.cloud9pane.unload();
             }
             
             function showSplitPosition(e) {

@@ -94,7 +94,7 @@ define(function(require, exports, module) {
             }, "close all tabs to the left of the focussed tab"],
             ["closepane", "Command-Ctrl-W", "Ctrl-W", function(){
                 return mnuContext.$tab || mnuContext.$pane || tabs.getTabs().length;
-            },  "close all tabs in this pane"],
+            },  "close this pane"],
             ["nosplit",    "", "", null, "no split"],
             ["hsplit",     "", "", null, "split the current pane in two columns and move the active tab to it"],
             ["vsplit",     "", "", null, "split the current pane in two rows and move the active tab to it"],
@@ -193,7 +193,7 @@ define(function(require, exports, module) {
             mnuTabs = new ui.menu();
             
             menus.addItemByPath("Window/Tabs", mnuTabs, 10100, plugin);
-            menus.addItemByPath("Window/Tabs/Close All Tabs In Pane", new ui.item({
+            menus.addItemByPath("Window/Tabs/Close Pane", new ui.item({
                 command: "closepane"
             }), 100, plugin);
             menus.addItemByPath("Window/Tabs/Close All Tabs In All Panes", new ui.item({
