@@ -1284,7 +1284,7 @@ define(function(require, exports, module) {
                 menus.addItemToMenu(mnuTabs, mnu = new ui.item({
                     caption: "More...",
                     onclick: function() {
-                        panels.activate("openfiles");
+                        commands.exec("toggleOpenfiles", null, {forceOpen: true});
                     }
                 }), start + length + 1, false);
                 menuItems.push(mnu);
