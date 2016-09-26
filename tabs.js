@@ -75,6 +75,10 @@ define(function(require, exports, module) {
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
             ["nextpane",       "Option-ESC",       "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
             ["previouspane",   "Option-Shift-ESC", "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
+            ["gotopaneleft",   "Option-H",         "Alt-H",          null,       "navigate to the pane on the left"],
+            ["gotopaneright",  "Option-L",         "Alt-L",          null,       "navigate to the pane on the right"],
+            ["gotopaneup",     "Option-K",         "Alt-K",          null,       "navigate to the pane on the top"],
+            ["gotopanedown",   "Option-J",         "Alt-J",          null,       "navigate to the pane on the bottom"],
             ["reopenLastTab",  "Option-Shift-T",   "Alt-Shift-T", function(){
                return menuClosedItems.length;
             }, "reopen last closed tab"],
@@ -818,7 +822,173 @@ define(function(require, exports, module) {
                 return next.pane;
             }
         }
+        
+        function gotopaneleft(){
+            return $goToPane("left");
+        }
+        
+        function gotopaneright(){
+            return $goToPane("right");
+        }
+        
+        function gotopanedown(){
+            return $goToPane("down");
+        }
+        
+        function gotopaneup(){
+            return $goToPane("up");
+        }
+        
+        function $goToPane(direction) {
+            var newPane = findPaneToGoTo(direction);
+            if (!newPane) return;
+            
+            var activeTab = newPane.activeTab;
+            tabs.focusTab(activeTab);
+        }
     
+        function getPaneDimensions(pane) {
+            var element = pane.container;
+            var size = getElementSize(element);
+            var dimensions = {
+                x: getElementOffset(element, "Left"),
+                y: getElementOffset(element, "Top"),
+                width: size.width,
+                height: size.height
+            };
+            return dimensions;
+            
+        }
+        
+        function getElementOffset(element, type) {
+            var offset = 0;
+            do {
+              if ( !isNaN( element['offset' + type] ) )
+              {
+                  offset += element['offset' + type];
+              }
+            } while( element = element.offsetParent );
+            return offset;
+        }
+        
+        function getElementSize(element) {
+            var computedStyle = window.getComputedStyle(element);
+            return {
+                width: parseInt(computedStyle.width, 10),
+                height: parseInt(computedStyle.height, 10),
+            };
+        }
+        
+        /** For each direction
+        * Exclude all panes not in the direction of this one
+        * Exclude all panes that don't intersect on the other axis
+        * Choose the closest pane
+        * In case of tie choose the pane to the furthest left or top.
+        **/
+            
+        function findBoxToGoTo(boxes, currentBox, direction) {
+            var possibleBoxes = [];
+            
+            switch (direction) {
+                case "left": 
+                    possibleBoxes = boxes
+                        .filter(function (box) { return box.x < currentBox.x; })
+                        .filter(areBoxesInLineVertically.bind(null, currentBox));
+                        
+                    if (!possibleBoxes.length) return null;
+                    
+                    var chosenBox = possibleBoxes.reduce(function (prev, cur) {
+                        if (!prev || cur.x > prev.x) return cur;
+                        if (cur.x == prev.x && cur.y < prev.y) return cur;
+                        return prev;
+                    });
+                    
+                    return chosenBox;
+                break;
+                case "right": 
+                    possibleBoxes = boxes
+                        .filter(function (box) { return box.x > currentBox.x; })
+                        .filter(areBoxesInLineVertically.bind(null, currentBox));
+                        
+                    if (!possibleBoxes.length) return null;
+                    
+                    var chosenBox = possibleBoxes.reduce(function (prev, cur) {
+                        if (!prev || cur.x < prev.x) return cur;
+                        if (cur.x == prev.x && cur.y < prev.y) return cur;
+                        return prev;
+                    });
+                    
+                    return chosenBox;
+                break;
+                case "up": 
+                    possibleBoxes = boxes
+                        .filter(function (box) { return box.y < currentBox.y; })
+                        .filter(areBoxesInLineHorizontally.bind(null, currentBox));
+                        
+                    if (!possibleBoxes.length) return null;
+                    
+                    var chosenBox = possibleBoxes.reduce(function (prev, cur) {
+                        if (!prev || cur.y > prev.y) return cur;
+                        if (cur.y == prev.y && cur.x < prev.x) return cur;
+                        return prev;
+                    });
+                    
+                    return chosenBox;
+                break;
+                case "down": 
+                    possibleBoxes = boxes
+                        .filter(function (box) { return box.y > currentBox.y; })
+                        .filter(areBoxesInLineHorizontally.bind(null, currentBox));
+                        
+                    if (!possibleBoxes.length) return null;
+                    
+                    var chosenBox = possibleBoxes.reduce(function (prev, cur) {
+                        if (!prev || cur.y < prev.y) return cur;
+                        if (cur.y == prev.y && cur.x < prev.x) return cur;
+                        return prev;
+                    });
+                    
+                    return chosenBox;
+                break;
+            }
+        }
+        
+        function areBoxesInLineVertically(box1, box2) {
+            return !(box1.y + box1.height < box2.y || box2.y + box2.height < box1.y);
+        }
+        
+        function areBoxesInLineHorizontally(box1, box2) {
+            return !(box1.x + box1.width < box2.x || box2.x + box2.width < box1.x);
+        }
+        
+        
+        function findPaneToGoTo(direction) {
+            var panes = tabs.getPanes();
+            if (!tabs.focussed || !tabs.focussedTab)
+                return;
+                
+            var currentPane = tabs.focussedTab.pane;
+            if (!currentPane) return;
+            
+            var boxes = panes.map(function (pane) { 
+                return getPaneDimensions(pane);
+            });
+            var currentBox = getPaneDimensions(currentPane);
+            
+            var newBox = findBoxToGoTo(boxes, currentBox, direction);
+            if (!newBox) return;
+            
+            var newPane = null;
+            panes.forEach(function (pane) {
+                var paneDimensions = getPaneDimensions(pane);
+                if (paneDimensions.x == newBox.x && paneDimensions.y == newBox.y) {
+                    newPane = pane;
+                }
+            });
+            
+            return newPane;
+        }
+        
         function gototabright(opts) {
             return cycleTab("right", opts);
         }
@@ -1533,6 +1703,36 @@ define(function(require, exports, module) {
              * 
              */
             previouspane: previouspane,
+            
+            /**
+             * 
+             */
+            gotopaneleft: gotopaneleft,
+            
+            /**
+             * 
+             */
+            gotopaneright: gotopaneright,
+            
+            /**
+             * 
+             */
+            gotopanedown: gotopanedown,
+            
+            /**
+             * 
+             */
+            gotopaneup: gotopaneup,
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
             /**
              * @ignore
