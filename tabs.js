@@ -75,10 +75,10 @@ define(function(require, exports, module) {
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
             ["nextpane",       "Option-ESC",       "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
             ["previouspane",   "Option-Shift-ESC", "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
-            ["gotopaneleft",   "Option-Left",      "Alt-Meta-Left",   null,       "navigate to the pane on the left"],
-            ["gotopaneright",  "Option-Right",     "Alt-Meta-Right",  null,       "navigate to the pane on the right"],
-            ["gotopaneup",     "Option-Up",        "Alt-Meta-Up",     null,       "navigate to the pane on the top"],
-            ["gotopanedown",   "Option-Down",      "Alt-Meta-Down",   null,       "navigate to the pane on the bottom"],
+            ["gotopaneleft",   "",                 "",                null,       "navigate to the pane on the left"],
+            ["gotopaneright",  "",                 "",                null,       "navigate to the pane on the right"],
+            ["gotopaneup",     "",                 "",                null,       "navigate to the pane on the top"],
+            ["gotopanedown",   "",                 "",                null,       "navigate to the pane on the bottom"],
             ["reopenLastTab",  "Option-Shift-T",   "Alt-Shift-T", function(){
                return menuClosedItems.length;
             }, "reopen last closed tab"],
