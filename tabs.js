@@ -72,10 +72,10 @@ define(function(require, exports, module) {
             ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
             ["nextpane",       "Option-ESC",       "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
             ["previouspane",   "Option-Shift-ESC", "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
-            ["gotopaneleft",   "",                 "",                null,       "navigate to the pane on the left"],
-            ["gotopaneright",  "",                 "",                null,       "navigate to the pane on the right"],
-            ["gotopaneup",     "",                 "",                null,       "navigate to the pane on the top"],
-            ["gotopanedown",   "",                 "",                null,       "navigate to the pane on the bottom"],
+            ["gotopaneright",  "Ctrl-Meta-Right",  "Ctrl-Meta-Right", null,       "navigate to the pane on the right"],
+            ["gotopaneleft",   "Ctrl-Meta-Left",   "Ctrl-Meta-Left",  null,       "navigate to the pane on the left"],
+            ["gotopaneup",     "Ctrl-Meta-Up",     "Ctrl-Meta-Up",    null,       "navigate to the pane on the top"],
+            ["gotopanedown",   "Ctrl-Meta-Down",   "Ctrl-Meta-Down",  null,       "navigate to the pane on the bottom"],
             ["reopenLastTab",  "Option-Shift-T",   "Alt-Shift-T", function(){
                return menuClosedItems.length;
             }, "reopen last closed tab"],
@@ -167,7 +167,7 @@ define(function(require, exports, module) {
             
             commands.addCommand({
                 name: "refocusTab",
-                bindKey: { mac: "Esc", win: "Esc",  position: -1000 },
+                bindKey: { mac: "Esc", win: "Esc", position: -1000 },
                 group: "Tabs",
                 isAvailable: function() {
                     var el = apf.activeElement;
@@ -297,14 +297,29 @@ define(function(require, exports, module) {
             }), 900, plugin);
             
             menus.addItemByPath("Window/Navigation/~", new ui.divider(), 1000, plugin);
+            
+            menus.addItemByPath("Window/Navigation/Go to Pane to Right", new ui.item({
+                command: "gotopaneright"
+            }), 1100, plugin);
+            menus.addItemByPath("Window/Navigation/Go to Pane to Left", new ui.item({
+                command: "gotopaneleft"
+            }), 1200, plugin);
+            menus.addItemByPath("Window/Navigation/Go to Pane to Up", new ui.item({
+                command: "gotopaneup"
+            }), 1300, plugin);
+            menus.addItemByPath("Window/Navigation/Go to Pane to Down", new ui.item({
+                command: "gotopanedown"
+            }), 1400, plugin);
+            
+            menus.addItemByPath("Window/Navigation/~", new ui.divider(), 1500, plugin);
 
             menus.addItemByPath("Window/Navigation/Next Pane in History", new ui.item({
                 command: "nextpane"
-            }), 1100, plugin);
+            }), 1600, plugin);
 
             menus.addItemByPath("Window/Navigation/Previous Pane in History", new ui.item({
                 command: "previouspane"
-            }), 1200, plugin);
+            }), 1700, plugin);
             
             // Tab Helper Menu
             menus.addItemByPath("Window/~", new ui.divider(), 10000, plugin);
