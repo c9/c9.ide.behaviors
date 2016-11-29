@@ -1,13 +1,9 @@
-/**
- * Tab Behaviors for the Cloud9
- *
- * @copyright 2013, Ajax.org B.V.
- */
+/*global apf*/
 define(function(require, exports, module) {
     main.consumes = [
         "Plugin", "settings", "menus", "preferences", "commands", 
         "tabManager", "ui", "save", "panels", "tree", "Menu", "fs",
-        "dialog.question"
+        "dialog.question", "clipboard"
     ];
     main.provides = ["tabbehavior"];
     return main;
@@ -19,6 +15,7 @@ define(function(require, exports, module) {
         var menus = imports.menus;
         var Menu = imports.Menu;
         var commands = imports.commands;
+        var clipboard = imports.clipboard;
         var tree = imports.tree;
         var save = imports.save;
         var panels = imports.panels;
@@ -185,6 +182,38 @@ define(function(require, exports, module) {
                 passEvent: true
             }, plugin);
             
+            commands.addCommand({
+                name: "copyFilePath",
+                group: "",
+                isAvailable: function() {
+                    var el = apf.popup.getCurrentElement();
+                    if (el && el.visible) {
+                        if (el.$tab)
+                            return !!(el.$tab.path || el.$tab.relatedPath);
+                    }
+                    return true;
+                },
+                exec: function(editor, args) {
+                    var text = "";
+                    var el = apf.popup.getCurrentElement();
+                    var fromContextMenu = args && args.source == "click";
+                    if (!fromContextMenu || !el) {
+                        var tab = tabs.focussedTab;
+                        text = tab.path || tab.relatedPath;
+                    }
+                    else if (el.name == "mnuCtxTree") {
+                        text = tree.selectedNodes.map(function(n) {
+                            return n.path;
+                        }).join("\n");
+                    }
+                    else if (el.$tab) {
+                        text = el.$tab.path || el.$tab.relatedPath;
+                    }
+                    if (text)
+                        clipboard.clipboardData.setData("text/plain", text);
+                }
+            }, plugin);
+            
             // General Menus
             menus.addItemByPath("File/~", new ui.divider(), 100000, plugin);
             menus.addItemByPath("File/Close File", new ui.item({
@@ -298,8 +327,15 @@ define(function(require, exports, module) {
                     apf.setStyleClass(mnuTabs.$ext, "", ["tabsContextMenu"]);
             }, true);
 
+            // Tree Context Menu
+            menus.addItemByPath("context/tree/Copy file path", new ui.item({
+                command: "copyFilePath"
+            }), 800, plugin);
+            menus.addItemByPath("context/tree/~", new ui.divider({}), 850, menus);
+            
             // Tab Context Menu
             mnuContext = new Menu({id : "mnuContext"}, plugin).aml;
+            menus.addItemByPath("context/tabs/", mnuContext, 0, plugin);
 
             function removeContextInfo(e) {
                 if (!e.value) {
@@ -317,6 +353,10 @@ define(function(require, exports, module) {
                 command: "revealtab"
             }), 100, mnuContext, plugin);
             menus.addItemByPath("~", new ui.divider(), 200, mnuContext, plugin);
+            menus.addItemByPath("Copy file path", new ui.item({
+                command: "copyFilePath"
+            }), 230, mnuContext, plugin);
+            menus.addItemByPath("~", new ui.divider(), 260, mnuContext, plugin);
             menus.addItemByPath("Close Tab", new ui.item({
                 command: "closetab"
             }), 300, mnuContext, plugin);
