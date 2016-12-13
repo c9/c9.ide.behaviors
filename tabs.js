@@ -40,7 +40,7 @@ define(function(require, exports, module) {
         var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab, dirtyNextPane;
 
         var ACTIVEPAGE = function(){ return tabs.focussedTab; };
-        var ACTIVEPATH = function(){ var tab = tabs.focussedTab; return tab && (tab.path || tab.relatedPath); };
+        var ACTIVEPATH = function(){ var tab = tabs.focussedTab; return tab && (tab.path || tab.relatedPath || tab.editor.getPathAsync); };
         var MORETABS = function(){ return tabs.getTabs().length > 1 };
         var MORETABSINPANE = function(){ return tabs.focussedTab && tabs.focussedTab.pane.getTabs().length > 1 };
         var MOREPANES = function(){ return tabs.getPanes().length > 1 };
@@ -189,7 +189,7 @@ define(function(require, exports, module) {
                     var el = apf.popup.getCurrentElement();
                     if (el && el.visible) {
                         if (el.$tab)
-                            return !!(el.$tab.path || el.$tab.relatedPath);
+                            return !!(el.$tab.path || el.$tab.relatedPath || el.$tab.editor.getPathAsync);
                     }
                     return true;
                 },
@@ -197,8 +197,9 @@ define(function(require, exports, module) {
                     var text = "";
                     var el = apf.popup.getCurrentElement();
                     var fromContextMenu = args && args.source == "click";
+                    var tab;
                     if (!fromContextMenu || !el) {
-                        var tab = tabs.focussedTab;
+                        tab = tabs.focussedTab;
                         text = tab.path || tab.relatedPath;
                     }
                     else if (el.name == "mnuCtxTree") {
@@ -207,10 +208,18 @@ define(function(require, exports, module) {
                         }).join("\n");
                     }
                     else if (el.$tab) {
-                        text = el.$tab.path || el.$tab.relatedPath;
+                        tab = el.$tab;
+                        text = tab.path || tab.relatedPath;
                     }
-                    if (text)
+                    if (text) {
                         clipboard.clipboardData.setData("text/plain", text);
+                    } else if (tab && tab.editor.getPathAsync) {
+                        tab.editor.getPathAsync(function(err, text) {
+                            if (!err && text)
+                                clipboard.clipboardData.setData("text/plain", text);
+                        })
+                    }
+                        
                 }
             }, plugin);
             
@@ -246,14 +255,14 @@ define(function(require, exports, module) {
             menus.addItemByPath("Window/Tabs/~", new ui.divider(), 1000300, plugin);
             
             menus.addItemByPath("Window/Tabs/~", new apf.label({
-                "class"   : "splits",
-                "caption" : "<span class='nosplit'></span>"
+                class: "splits",
+                caption: "<span class='nosplit'></span>"
                     + "<span class='twovsplit'></span>"
                     + "<span class='twohsplit'></span>"
                     + "<span class='foursplit'></span>"
                     + "<span class='threeleft'></span>"
                     + "<span class='threeright'></span>",
-                "onclick" : function(e) {
+                onclick: function(e) {
                     var span = e.htmlEvent.target;
                     if (!span || span.tagName != "SPAN") return;
                     plugin[span.className]();
@@ -1188,11 +1197,22 @@ define(function(require, exports, module) {
         function revealInTree(tab, noFocus) {
             panels.activate("tree");
             var path = tab.path || tab.relatedPath;
-            tree.expand(path, function(err) {
-                if (!err)
-                    tree.select(path);
-                tree.scrollToSelection();
-            });
+            
+            if (path) {
+                handlePath(null, path);
+            } else if (tab.editor.getPathAsync) {
+                tab.editor.getPathAsync(handlePath);
+            }
+            function handlePath(err, path) {
+                if (err || !path)
+                    return console.error(err);
+                tree.expand(path, function(err) {
+                    if (!err)
+                        tree.select(path);
+                    tree.scrollToSelection();
+                });
+            }
+            
             if (!noFocus)
                 tree.focus();
         }
