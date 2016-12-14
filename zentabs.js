@@ -10,9 +10,6 @@ define(function(require, exports, module) {
         var settings = imports.settings;
 
         /***** Initialization *****/
-
-        var zentabsEnabled;
-        var tabLimit;
         var plugin = new Plugin("Ajax.org", main.consumes);
 
         function load() {
@@ -23,8 +20,8 @@ define(function(require, exports, module) {
                         position: 100,
                         "Limit number of open tabs per pane (Zentabs)": {
                             type: "checked-spinner",
-                            checkboxPath: "project/zentabs/@useZenTabs",
-                            path: "project/zentabs/@tabLimit",
+                            checkboxPath: "user/zentabs/@useZenTabs",
+                            path: "user/zentabs/@tabLimit",
                             min: 0,
                             max: 1000,
                             position: 1000
@@ -40,10 +37,10 @@ define(function(require, exports, module) {
         function zenTabs(event) {
             var tab = event.tab;
             
-            zentabsEnabled = settings.getBool("project/zentabs/@useZenTabs");
+            var zentabsEnabled = settings.getBool("user/zentabs/@useZenTabs");
             if (!zentabsEnabled) return;
 
-            tabLimit = settings.get("project/zentabs/@tabLimit");
+            var tabLimit = settings.get("user/zentabs/@tabLimit");
             var openTabs = tab.pane.meta.accessList;
             var tabsToRemove = openTabs.length - tabLimit;
 
