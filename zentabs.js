@@ -16,15 +16,15 @@ define(function(require, exports, module) {
             prefs.add({
                 "Project": {
                     position: 10,
-                    "Code Editor (Ace)": {
-                        position: 100,
+                    "Tabs and IDE Layout": {
+                        position: 1500,
                         "Limit number of open tabs per pane (Zentabs)": {
                             type: "checked-spinner",
                             checkboxPath: "user/zentabs/@useZenTabs",
                             path: "user/zentabs/@tabLimit",
                             min: 0,
                             max: 1000,
-                            position: 1000
+                            position: 100
                         }
                     }
                 }
