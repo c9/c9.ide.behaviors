@@ -211,6 +211,7 @@ define(function(require, exports, module) {
                         tab = el.$tab;
                         text = tab.path || tab.relatedPath;
                     }
+                    
                     if (text) {
                         clipboard.clipboardData.setData("text/plain", text);
                     } 
@@ -1199,11 +1200,11 @@ define(function(require, exports, module) {
             panels.activate("tree");
             var path = tab.path || tab.relatedPath;
             
-            if (path) {
+            if (path)
                 done(null, path);
-            } else if (tab.editor.getPathAsync) {
+            else if (tab.editor.getPathAsync)
                 tab.editor.getPathAsync(done);
-            }            
+            
             if (!noFocus)
                 tree.focus();
             
