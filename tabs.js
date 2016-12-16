@@ -213,7 +213,8 @@ define(function(require, exports, module) {
                     }
                     if (text) {
                         clipboard.clipboardData.setData("text/plain", text);
-                    } else if (tab && tab.editor.getPathAsync) {
+                    } 
+                    else if (tab && tab.editor.getPathAsync) {
                         tab.editor.getPathAsync(function(err, text) {
                             if (!err && text)
                                 clipboard.clipboardData.setData("text/plain", text);
@@ -1199,11 +1200,14 @@ define(function(require, exports, module) {
             var path = tab.path || tab.relatedPath;
             
             if (path) {
-                handlePath(null, path);
+                done(null, path);
             } else if (tab.editor.getPathAsync) {
-                tab.editor.getPathAsync(handlePath);
-            }
-            function handlePath(err, path) {
+                tab.editor.getPathAsync(done);
+            }            
+            if (!noFocus)
+                tree.focus();
+            
+            function done(err, path) {
                 if (err || !path)
                     return console.error(err);
                 tree.expand(path, function(err) {
@@ -1212,9 +1216,6 @@ define(function(require, exports, module) {
                     tree.scrollToSelection();
                 });
             }
-            
-            if (!noFocus)
-                tree.focus();
         }
         
         function canTabBeRemoved(pane, min) {
