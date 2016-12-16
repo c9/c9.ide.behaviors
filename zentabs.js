@@ -18,7 +18,7 @@ define(function(require, exports, module) {
                     position: 10,
                     "Tabs and IDE Layout": {
                         position: 1500,
-                        "Limit number of open tabs per pane (Zentabs)": {
+                        "Limit number of open tabs per pane (ZenTabs)": {
                             type: "checked-spinner",
                             checkboxPath: "user/zentabs/@useZenTabs",
                             path: "user/zentabs/@tabLimit",
