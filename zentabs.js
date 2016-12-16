@@ -30,11 +30,11 @@ define(function(require, exports, module) {
                 }
             }, plugin);
 
-            tabManager.on("open", zenTabs, plugin);
+            tabManager.on("open", runZenTabs, plugin);
         }
 
         /***** Methods *****/
-        function zenTabs(event) {
+        function runZenTabs(event) {
             var tab = event.tab;
             
             var zentabsEnabled = settings.getBool("user/zentabs/@useZenTabs");
