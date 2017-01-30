@@ -39,75 +39,75 @@ define(function(require, exports, module) {
         
         var cycleKeyPressed, changedTabs, unchangedTabs, dirtyNextTab, dirtyNextPane;
 
-        var ACTIVEPAGE = function(){ return tabs.focussedTab; };
-        var ACTIVEPATH = function(){ var tab = tabs.focussedTab; return tab && (tab.path || tab.relatedPath || tab.editor.getPathAsync); };
-        var MORETABS = function(){ return tabs.getTabs().length > 1 };
-        var MORETABSINPANE = function(){ return tabs.focussedTab && tabs.focussedTab.pane.getTabs().length > 1 };
-        var MOREPANES = function(){ return tabs.getPanes().length > 1 };
+        var ACTIVEPAGE = function() { return tabs.focussedTab; };
+        var ACTIVEPATH = function() { var tab = tabs.focussedTab; return tab && (tab.path || tab.relatedPath || tab.editor.getPathAsync); };
+        var MORETABS = function() { return tabs.getTabs().length > 1; };
+        var MORETABSINPANE = function() { return tabs.focussedTab && tabs.focussedTab.pane.getTabs().length > 1; };
+        var MOREPANES = function() { return tabs.getPanes().length > 1; };
         
         var movekey = "Command-Option-Shift";
         var definition = [
-            ["clonetab",       "",                 "",                ACTIVEPAGE, "create a new tab with a view on the same file"],
-            ["closetab",       "Option-W",         "Alt-W",           ACTIVEPAGE, "close the tab that is currently active"],
-            ["closealltabs",   "Option-Shift-W",   "Alt-Shift-W",     ACTIVEPAGE, "close all opened tabs"],
-            ["closeallbutme",  "Option-Ctrl-W",    "Ctrl-Alt-W",      MORETABS,   "close all opened tabs, except the tab that is currently active"],
-            ["gototabright",   "Command-]",        "Ctrl-]",          MORETABSINPANE,  "navigate to the next tab, right to the tab that is currently active"],
-            ["gototableft",    "Command-[",        "Ctrl-[",          MORETABSINPANE,  "navigate to the next tab, left to the tab that is currently active"],
-            ["movetabright",   movekey + "-Right", "Ctrl-Meta-Right", MORETABS,   "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
-            ["movetableft",    movekey + "-Left",  "Ctrl-Meta-Left",  MORETABS,   "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
-            ["movetabup",      movekey + "-Up",    "Ctrl-Meta-Up",    MORETABS,   "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
-            ["movetabdown",    movekey + "-Down",  "Ctrl-Meta-Down",  MORETABS,   "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
-            ["tab1",           "Command-1",        "Ctrl-1",          null,       "navigate to the first tab"],
-            ["tab2",           "Command-2",        "Ctrl-2",          null,       "navigate to the second tab"],
-            ["tab3",           "Command-3",        "Ctrl-3",          null,       "navigate to the third tab"],
-            ["tab4",           "Command-4",        "Ctrl-4",          null,       "navigate to the fourth tab"],
-            ["tab5",           "Command-5",        "Ctrl-5",          null,       "navigate to the fifth tab"],
-            ["tab6",           "Command-6",        "Ctrl-6",          null,       "navigate to the sixth tab"],
-            ["tab7",           "Command-7",        "Ctrl-7",          null,       "navigate to the seventh tab"],
-            ["tab8",           "Command-8",        "Ctrl-8",          null,       "navigate to the eighth tab"],
-            ["tab9",           "Command-9",        "Ctrl-9",          null,       "navigate to the ninth tab"],
-            ["tab0",           "Command-0",        "Ctrl-0",          null,       "navigate to the tenth tab"],
-            ["revealtab",      "Command-Shift-L",  "Ctrl-Shift-L",    ACTIVEPATH, "reveal current tab in the file tree"],
-            ["nexttab",        "Option-Tab",       "Ctrl-Tab",        MORETABSINPANE,  "navigate to the next tab in the stack of accessed tabs"],
-            ["previoustab",    "Option-Shift-Tab", "Ctrl-Shift-Tab",  MORETABSINPANE,  "navigate to the previous tab in the stack of accessed tabs"],
-            ["nextpane",       "Option-ESC",       "Ctrl-`",          MOREPANES,   "navigate to the next tab in the stack of panes"],
-            ["previouspane",   "Option-Shift-ESC", "Ctrl-Shift-`",    MOREPANES,   "navigate to the previous tab in the stack of panes"],
-            ["gotopaneright",  "Ctrl-Meta-Right",  "Ctrl-Meta-Right", null,       "navigate to the pane on the right"],
-            ["gotopaneleft",   "Ctrl-Meta-Left",   "Ctrl-Meta-Left",  null,       "navigate to the pane on the left"],
-            ["gotopaneup",     "Ctrl-Meta-Up",     "Ctrl-Meta-Up",    null,       "navigate to the pane on the top"],
-            ["gotopanedown",   "Ctrl-Meta-Down",   "Ctrl-Meta-Down",  null,       "navigate to the pane on the bottom"],
-            ["reopenLastTab",  "Option-Shift-T",   "Alt-Shift-T", function(){
+            ["clonetab", "", "", ACTIVEPAGE, "create a new tab with a view on the same file"],
+            ["closetab", "Option-W", "Alt-W", ACTIVEPAGE, "close the tab that is currently active"],
+            ["closealltabs", "Option-Shift-W", "Alt-Shift-W", ACTIVEPAGE, "close all opened tabs"],
+            ["closeallbutme", "Option-Ctrl-W", "Ctrl-Alt-W", MORETABS, "close all opened tabs, except the tab that is currently active"],
+            ["gototabright", "Command-]", "Ctrl-]", MORETABSINPANE, "navigate to the next tab, right to the tab that is currently active"],
+            ["gototableft", "Command-[", "Ctrl-[", MORETABSINPANE, "navigate to the next tab, left to the tab that is currently active"],
+            ["movetabright", movekey + "-Right", "Ctrl-Meta-Right", MORETABS, "move the tab that is currently active to the right. Will create a split tab to the right if it's the right most tab."],
+            ["movetableft", movekey + "-Left", "Ctrl-Meta-Left", MORETABS, "move the tab that is currently active to the left. Will create a split tab to the left if it's the left most tab."],
+            ["movetabup", movekey + "-Up", "Ctrl-Meta-Up", MORETABS, "move the tab that is currently active to the up. Will create a split tab to the top if it's the top most tab."],
+            ["movetabdown", movekey + "-Down", "Ctrl-Meta-Down", MORETABS, "move the tab that is currently active to the down. Will create a split tab to the bottom if it's the bottom most tab."],
+            ["tab1", "Command-1", "Ctrl-1", null, "navigate to the first tab"],
+            ["tab2", "Command-2", "Ctrl-2", null, "navigate to the second tab"],
+            ["tab3", "Command-3", "Ctrl-3", null, "navigate to the third tab"],
+            ["tab4", "Command-4", "Ctrl-4", null, "navigate to the fourth tab"],
+            ["tab5", "Command-5", "Ctrl-5", null, "navigate to the fifth tab"],
+            ["tab6", "Command-6", "Ctrl-6", null, "navigate to the sixth tab"],
+            ["tab7", "Command-7", "Ctrl-7", null, "navigate to the seventh tab"],
+            ["tab8", "Command-8", "Ctrl-8", null, "navigate to the eighth tab"],
+            ["tab9", "Command-9", "Ctrl-9", null, "navigate to the ninth tab"],
+            ["tab0", "Command-0", "Ctrl-0", null, "navigate to the tenth tab"],
+            ["revealtab", "Command-Shift-L", "Ctrl-Shift-L", ACTIVEPATH, "reveal current tab in the file tree"],
+            ["nexttab", "Option-Tab", "Ctrl-Tab", MORETABSINPANE, "navigate to the next tab in the stack of accessed tabs"],
+            ["previoustab", "Option-Shift-Tab", "Ctrl-Shift-Tab", MORETABSINPANE, "navigate to the previous tab in the stack of accessed tabs"],
+            ["nextpane", "Option-ESC", "Ctrl-`", MOREPANES, "navigate to the next tab in the stack of panes"],
+            ["previouspane", "Option-Shift-ESC", "Ctrl-Shift-`", MOREPANES, "navigate to the previous tab in the stack of panes"],
+            ["gotopaneright", "Ctrl-Meta-Right", "Ctrl-Meta-Right", null, "navigate to the pane on the right"],
+            ["gotopaneleft", "Ctrl-Meta-Left", "Ctrl-Meta-Left", null, "navigate to the pane on the left"],
+            ["gotopaneup", "Ctrl-Meta-Up", "Ctrl-Meta-Up", null, "navigate to the pane on the top"],
+            ["gotopanedown", "Ctrl-Meta-Down", "Ctrl-Meta-Down", null, "navigate to the pane on the bottom"],
+            ["reopenLastTab", "Option-Shift-T", "Alt-Shift-T", function() {
                return menuClosedItems.length;
             }, "reopen last closed tab"],
-            ["closealltotheright", "", "", function(){
+            ["closealltotheright", "", "", function() {
                 var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
                 if (tab) {
                     var pages = tab.pane.getTabs();
                     return pages.pop() != tab;
                 }
             }, "close all tabs to the right of the focussed tab"],
-            ["closealltotheleft", "", "", function(){
+            ["closealltotheleft", "", "", function() {
                 var tab = mnuContext.$tab || mnuContext.$pane && mnuContext.$pane.getTab();
                 if (tab) {
                     var pages = tab.pane.getTabs();
                     return pages.length > 1 && pages[0] != tab;
                 }
             }, "close all tabs to the left of the focussed tab"],
-            ["closepane", "Command-Ctrl-W", "Ctrl-W", function(){
+            ["closepane", "Command-Ctrl-W", "Ctrl-W", function() {
                 return mnuContext.$tab || mnuContext.$pane || tabs.getTabs().length;
-            },  "close this pane"],
-            ["nosplit",    "", "", null, "no split"],
-            ["hsplit",     "", "", null, "split the current pane in two columns and move the active tab to it"],
-            ["vsplit",     "", "", null, "split the current pane in two rows and move the active tab to it"],
-            ["twovsplit",  "", "", null, "create a two pane row layout"],
-            ["twohsplit",  "", "", null, "create a two pane column layout"],
-            ["foursplit",  "", "", null, "create a four pane layout"],
-            ["threeleft",  "", "", null, "create a three pane layout with the stack on the left side"],
+            }, "close this pane"],
+            ["nosplit", "", "", null, "no split"],
+            ["hsplit", "", "", null, "split the current pane in two columns and move the active tab to it"],
+            ["vsplit", "", "", null, "split the current pane in two rows and move the active tab to it"],
+            ["twovsplit", "", "", null, "create a two pane row layout"],
+            ["twohsplit", "", "", null, "create a two pane column layout"],
+            ["foursplit", "", "", null, "create a four pane layout"],
+            ["threeleft", "", "", null, "create a three pane layout with the stack on the left side"],
             ["threeright", "", "", null, "create a three pane layout with the stack on the right side"]
         ];
         
         var loaded = false;
-        function load(){
+        function load() {
             if (loaded) return false;
             loaded = true;
             
@@ -138,9 +138,9 @@ define(function(require, exports, module) {
     
             // Preferences
             prefs.add({
-                "General" : {
-                    "Tree & Navigate" : {
-                        "Reveal Active File in Project Tree" : {
+                "General": {
+                    "Tree & Navigate": {
+                        "Reveal Active File in Project Tree": {
                             type: "checkbox",
                             position: 4000,
                             path: "user/general/@revealfile"
@@ -219,7 +219,7 @@ define(function(require, exports, module) {
                         tab.editor.getPathAsync(function(err, text) {
                             if (!err && text)
                                 clipboard.clipboardData.setData("text/plain", text);
-                        })
+                        });
                     }
                         
                 }
@@ -360,13 +360,13 @@ define(function(require, exports, module) {
             menus.addItemByPath("context/tree/~", new ui.divider({}), 850, menus);
             
             // Tab Context Menu
-            mnuContext = new Menu({id : "mnuContext"}, plugin).aml;
+            mnuContext = new Menu({ id: "mnuContext" }, plugin).aml;
             menus.addItemByPath("context/tabs/", mnuContext, 0, plugin);
 
             function removeContextInfo(e) {
                 if (!e.value) {
                     // use setTimeout because apf closes menu before menuitem onclick event
-                    setTimeout(function(){
+                    setTimeout(function() {
                         mnuContext.$tab = null;
                         mnuContext.$pane = null;
                     });
@@ -447,8 +447,8 @@ define(function(require, exports, module) {
                 caption: "Recently Closed Tabs",
                 disabled: true
             }), 1000001, plugin);
-            menuClosedItems.hide = function(){ div.hide(); label.hide(); };
-            menuClosedItems.show = function(){ div.show(); label.show(); };
+            menuClosedItems.hide = function() { div.hide(); label.hide(); };
+            menuClosedItems.show = function() { div.show(); label.show(); };
             menuClosedItems.hide();
 
             // Other Hooks
@@ -683,7 +683,7 @@ define(function(require, exports, module) {
                 paneList.push(tab);
         }
         
-        function accessListToJson(){
+        function accessListToJson() {
             var list = [];
             this.forEach(function(tab, i) {
                 if (tab && tab.name)
@@ -708,7 +708,7 @@ define(function(require, exports, module) {
             if (!pane || pane == tab.pane)
                 pane = tab.pane.hsplit(true);
             
-            tabs.clone(tab, pane, function(err, tab){
+            tabs.clone(tab, pane, function(err, tab) {
                 
             });
         }
@@ -823,7 +823,7 @@ define(function(require, exports, module) {
             closeallbutme(tab, pages.slice(0, currIdx));
         }
     
-        function nexttab(){
+        function nexttab() {
             if (tabs.getTabs().length === 1)
                 return;
             
@@ -841,7 +841,7 @@ define(function(require, exports, module) {
             dirtyNextTab = true;
         }
     
-        function previoustab(){
+        function previoustab() {
             if (tabs.getTabs().length === 1)
                 return;
                 
@@ -859,11 +859,11 @@ define(function(require, exports, module) {
             dirtyNextTab = true;
         }
     
-        function nextpane(){
+        function nextpane() {
             return $nextPane(1);
         }
         
-        function previouspane(){
+        function previouspane() {
             return $nextPane(-1);
         }
         
@@ -889,19 +889,19 @@ define(function(require, exports, module) {
             }
         }
         
-        function gotopaneleft(){
+        function gotopaneleft() {
             return $goToPane("left");
         }
         
-        function gotopaneright(){
+        function gotopaneright() {
             return $goToPane("right");
         }
         
-        function gotopanedown(){
+        function gotopanedown() {
             return $goToPane("down");
         }
         
-        function gotopaneup(){
+        function gotopaneup() {
             return $goToPane("up");
         }
         
@@ -929,11 +929,11 @@ define(function(require, exports, module) {
         function getElementOffset(element, type) {
             var offset = 0;
             do {
-              if ( !isNaN( element['offset' + type] ) )
+              if (!isNaN(element['offset' + type]))
               {
                   offset += element['offset' + type];
               }
-            } while( element = element.offsetParent );
+            } while (element = element.offsetParent);
             return offset;
         }
         
@@ -1083,9 +1083,9 @@ define(function(require, exports, module) {
                 var idx = currIdx;
                 switch (dir) {
                     case "right": idx++; break;
-                    case "left":  idx--; break;
+                    case "left": idx--; break;
                     case "first": idx = 0; break;
-                    case "last":  idx = pages.length - 1; break;
+                    case "last": idx = pages.length - 1; break;
                     default: idx--;
                 }
         
@@ -1264,10 +1264,10 @@ define(function(require, exports, module) {
             state.type = type == "vsplitbox" ? "vsplit" : "hsplit";
             state.far = nodes.indexOf(pane.aml) == 1;
             state.sibling = nodes[state.far ? 0 : 1];
-            state.getState = function(){ return state };
+            state.getState = function() { return state; };
             state.restore = $restoreTabGroup;
             state.paneName = pane.name;
-            state.document = { meta: {} };
+            state.document = { meta: {}};
             
             // Close pages
             pages.forEach(function(tab) { 
@@ -1276,7 +1276,7 @@ define(function(require, exports, module) {
             });
             
             tabs.resizePanes();
-            checkTabRender(function(){
+            checkTabRender(function() {
                 if (canTabBeRemoved(pane))
                     pane.unload();
                     
@@ -1301,7 +1301,7 @@ define(function(require, exports, module) {
             
             state.forEach(function(s) {
                 s.pane = newpane;
-                tabs.open(s, function(){});
+                tabs.open(s, function() {});
             });
         }
         
@@ -1329,7 +1329,7 @@ define(function(require, exports, module) {
                 tab.attachTo(newpane);
         }
         
-        function nosplit(){
+        function nosplit() {
             var panes = tabs.getPanes(tabs.container);
             var first = panes[0];
             for (var pane, i = 1, li = panes.length; i < li; i++) {
@@ -1374,22 +1374,22 @@ define(function(require, exports, module) {
             return [panes[0], newtab];
         }
         
-        function twohsplit(){
-            return twovsplit(true)
+        function twohsplit() {
+            return twovsplit(true);
         }
         
-        function foursplit(){
+        function foursplit() {
             var panes = twohsplit();
             panes[0].vsplit(true);
             panes[1].vsplit(true);
         }
         
-        function threeleft(){
+        function threeleft() {
             var panes = twohsplit();
             panes[0].vsplit(true);
         }
         
-        function threeright(){
+        function threeright() {
             var panes = twohsplit();
             panes[1].vsplit(true);
         }
@@ -1413,10 +1413,10 @@ define(function(require, exports, module) {
                     question("File Changed",
                       tab.path + " has been changed on disk.",
                       "Would you like to reload this file?",
-                      function(){
-                          tabs.reload(tab, function(){});
+                      function() {
+                          tabs.reload(tab, function() {});
                       }, 
-                      function(){
+                      function() {
                           // Set to changed
                           doc.undoManager.bookmark(-2);
                       }, 
@@ -1460,7 +1460,7 @@ define(function(require, exports, module) {
                     // Open pane
                     restore
                         ? restore(state)
-                        : tabs.open(state, function(){});
+                        : tabs.open(state, function() {});
                         
                     tabs.off("open", checkReopenedTab);
                     
@@ -1531,7 +1531,7 @@ define(function(require, exports, module) {
                 menus.addItemToMenu(mnuTabs, mnu = new ui.item({
                     caption: "More...",
                     onclick: function() {
-                        commands.exec("toggleOpenfiles", null, {forceOpen: true});
+                        commands.exec("toggleOpenfiles", null, { forceOpen: true });
                     }
                 }), start + length + 1, false);
                 menuItems.push(mnu);
@@ -1547,16 +1547,16 @@ define(function(require, exports, module) {
     
         /***** Lifecycle *****/
         
-        plugin.on("load", function(){
+        plugin.on("load", function() {
             load();
         });
-        plugin.on("enable", function(){
+        plugin.on("enable", function() {
             
         });
-        plugin.on("disable", function(){
+        plugin.on("disable", function() {
             
         });
-        plugin.on("unload", function(){
+        plugin.on("unload", function() {
             menuItems.forEach(function(item) {
                 item.destroy(true, true);
             });
@@ -1594,7 +1594,7 @@ define(function(require, exports, module) {
             /**
              * 
              */
-            get contextMenu(){ return mnuContext; },
+            get contextMenu() { return mnuContext; },
             
             /**
              * 
@@ -1649,52 +1649,52 @@ define(function(require, exports, module) {
             /**
              * 
              */
-            tab1 : tab1,
+            tab1: tab1,
             
             /**
              * 
              */
-            tab2 : tab2,
+            tab2: tab2,
             
             /**
              * 
              */
-            tab3 : tab3,
+            tab3: tab3,
             
             /**
              * 
              */
-            tab4 : tab4,
+            tab4: tab4,
             
             /**
              * 
              */
-            tab5 : tab5,
+            tab5: tab5,
             
             /**
              * 
              */
-            tab6 : tab6,
+            tab6: tab6,
             
             /**
              * 
              */
-            tab7 : tab7,
+            tab7: tab7,
             
             /**
              * 
              */
-            tab8 : tab8,
+            tab8: tab8,
             
             /**
              * 
              */
-            tab9 : tab9,
+            tab9: tab9,
             
             /**
              * 
              */
-            tab0 : tab0,
+            tab0: tab0,
             
             /**
              * 

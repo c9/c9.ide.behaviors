@@ -16,12 +16,12 @@ define(function(require, exports, module) {
         var divSplit;
         
         var loaded = false;
-        function load(){
+        function load() {
             if (loaded) return false;
             loaded = true;
             
             // @todo how to make sure this happens only once?
-            var css = require("text!./style.css")
+            var css = require("text!./style.css");
             ui.insertCss(css, options.staticPrefix, handle);
 
             dashboard.on("widgetCreate", function(e) {
@@ -44,7 +44,7 @@ define(function(require, exports, module) {
             var originalBox, box, started, start;
             var originalPosition, splitDirection, splitBox, originalSize;
             
-            function finish(){
+            function finish() {
                 divSplit.style.display = "none";
                 
                 apf.removeListener(document, "mousemove", mouseMoveSplit);
@@ -95,7 +95,7 @@ define(function(require, exports, module) {
                 }
                 
                 // Fixate current position and width
-                start = function(){
+                start = function() {
                     rect = container.getBoundingClientRect();
                     container.style.width = (dragWidth - ui.getWidthDiff(container)) + "px";
                     container.style.height = (dragHeight - ui.getHeightDiff(container)) + "px";
@@ -111,7 +111,7 @@ define(function(require, exports, module) {
                     });
                     
                     document.body.appendChild(container);
-                }
+                };
                 
                 apf.addListener(document, "mousemove", mouseMoveSplit);
                 apf.addListener(document, "mouseup", mouseUpSplit);
@@ -265,16 +265,16 @@ define(function(require, exports, module) {
         
         /***** Lifecycle *****/
         
-        handle.on("load", function(){
+        handle.on("load", function() {
             load();
         });
-        handle.on("enable", function(){
+        handle.on("enable", function() {
             
         });
-        handle.on("disable", function(){
+        handle.on("disable", function() {
             
         });
-        handle.on("unload", function(){
+        handle.on("unload", function() {
             loaded = false;
         });
         

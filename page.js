@@ -24,14 +24,14 @@ define(function(require, exports, module) {
         var divSplit, divButton, plusMargin = 11;
         
         var loaded = false;
-        function load(){
+        function load() {
             if (loaded) return false;
             loaded = true;
             
             // Insert CSS
             ui.insertCss(css, options.staticPrefix, handle);
             
-            settings.on("read", function(){
+            settings.on("read", function() {
                 settings.setDefaults("user/tabs", [["autoclosepanes", true]]);
             }, handle);
 
@@ -41,7 +41,7 @@ define(function(require, exports, module) {
                 addInteraction(tab);
                 
                 // Make sure that events are put on the button when the skin changes
-                tab.aml.on("$skinchange", function(){
+                tab.aml.on("$skinchange", function() {
                     addInteraction(tab);
                 });
             }, handle);
@@ -59,10 +59,10 @@ define(function(require, exports, module) {
             }, handle);
             
             prefs.add({
-               "General" : {
-                    "User Interface" : {
+               "General": {
+                    "User Interface": {
                         position: 20,
-                        "Automatically Close Empty Panes" : {
+                        "Automatically Close Empty Panes": {
                             type: "checkbox",
                             path: "user/tabs/@autoclosepanes",
                             position: 1150
@@ -82,7 +82,7 @@ define(function(require, exports, module) {
             for (var i = 0; i < containers.length; i++) {
                 if (ui.isChildOf(containers[i], pane.aml)) {
                     return containers[i]
-                        .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1
+                        .getElementsByTagNameNS(apf.ns.aml, "tab").length > 1;
                 }
             }
             return false;
@@ -100,7 +100,7 @@ define(function(require, exports, module) {
             
             function setOrderMode(toTab, e) {
                 if (toTab.isOrderCleaned === false) {
-                    return setTimeout(function(){
+                    return setTimeout(function() {
                         setOrderMode(toTab, e);
                     }, 10);
                 }
@@ -175,7 +175,7 @@ define(function(require, exports, module) {
                     btn.style.position = "absolute";
                 }
                 
-                start = function(){
+                start = function() {
                     // Remove from childNodes of old pane
                     var lastIndex = pane.childNodes.indexOf(tab);
                     pane.childNodes.remove(tab);
@@ -244,7 +244,7 @@ define(function(require, exports, module) {
                 for (var i = 0; i < frames.length; i++)
                     frames[i].style.pointerEvents = "none";
                 
-                start = function(){
+                start = function() {
                     // Fixate current position and width
                     var rect = button.getBoundingClientRect();
                     button.style.left = (rect.left) + "px";
@@ -277,7 +277,7 @@ define(function(require, exports, module) {
                     
                 clean && clean(true);
                     
-                clean = function(){
+                clean = function() {
                     button.style.left = 
                     button.style.top = 
                     button.style.width = 
@@ -290,7 +290,7 @@ define(function(require, exports, module) {
                     
                     apf.removeListener(document, "mousemove", mouseMoveSplit);
                     apf.removeListener(document, "mouseup", mouseUpSplit);
-                }
+                };
                 
                 if (started) {
                     // Set initial position and detect immediate snap
@@ -299,7 +299,7 @@ define(function(require, exports, module) {
                 }
             }
             
-            function finish(){
+            function finish() {
                 if (!initMouse) {
                     clean(null, null, true);
                     
@@ -326,7 +326,7 @@ define(function(require, exports, module) {
                 startX = e.clientX; 
                 startY = e.clientY; 
                 
-                initMouse = function(){
+                initMouse = function() {
                     // Calculate where on the button was clicked
                     var rect = button.getBoundingClientRect();
                     offsetX = startX - rect.left;
@@ -340,7 +340,7 @@ define(function(require, exports, module) {
                     setOrderMode(tab.parentNode, e);
                     
                     initMouse = null;
-                }
+                };
                 
                 // Use mine
                 started = false;
@@ -390,7 +390,7 @@ define(function(require, exports, module) {
                     
                     // Reparent for real
                     var insert = pages[idx] && pages[idx].cloud9tab;
-                    plugin.attachTo(pane.cloud9pane, insert, true)
+                    plugin.attachTo(pane.cloud9pane, insert, true);
                 }
                 else {
                     // If we're already at this position do nothing
@@ -416,7 +416,7 @@ define(function(require, exports, module) {
             function animateTabs(finish, includeTab, toWidth) {
                 // Get new pages array (with new order)
                 pages = pane.getPages();
-                pages.push({$button: btnPlus});
+                pages.push({ $button: btnPlus });
                 
                 // Animate all pages to their right position
                 var p, tweens = [], offset = 0;
@@ -453,7 +453,7 @@ define(function(require, exports, module) {
                     }
                 }
                 
-                anims.animateMultiple(tweens, function(){
+                anims.animateMultiple(tweens, function() {
                     finish && finish();
                 });
             }
@@ -675,16 +675,16 @@ define(function(require, exports, module) {
         
         /***** Lifecycle *****/
         
-        handle.on("load", function(){
+        handle.on("load", function() {
             load();
         });
-        handle.on("enable", function(){
+        handle.on("enable", function() {
             
         });
-        handle.on("disable", function(){
+        handle.on("disable", function() {
             
         });
-        handle.on("unload", function(){
+        handle.on("unload", function() {
             loaded = false;
         });
         
@@ -693,8 +693,8 @@ define(function(require, exports, module) {
         /**
          **/
         handle.freezePublicAPI({
-            get plusMargin(){ return plusMargin; },
-            set plusMargin(v){ plusMargin = v; }
+            get plusMargin() { return plusMargin; },
+            set plusMargin(v) { plusMargin = v; }
         });
         
         register(null, {
